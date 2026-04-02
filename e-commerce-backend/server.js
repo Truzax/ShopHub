@@ -1,30 +1,30 @@
 require('dotenv').config();
 
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const User = require('./models/User')
+const express = require('express');
+const cors = require('cors');
+const connectDB = require('./config/db');
+const usersRoute = require('./routes/users');
+const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
 const PORT = process.env.PORT || 3001;
-const MONGO_URI = process.env.MONGO_URI;
 
-mongoose.connect(MONGO_URI)
-    .then(() => console.log("Mongodb connected!"))
-    .catch(err => console.log(err));
+// Connect to MongoDB
+connectDB().catch(err => console.error('DB connection error:', err));
 
-app.get('/', (req, res) => {
-    res.send("Server is running");
-});
+// Base route
+app.get('/', (req, res) => res.send('Server is running'));
 
-app.get('/api/users', async (req, res) => {
-    const users = await User.find();
-    res.json(users);
-});
+// API routes
+app.use('/api/users', usersRoute);
 
+// Error handler
+app.use(errorHandler);
+
+// Start the server
 app.listen(PORT, () => {
-    console.log(`Server is running on port: ${PORT}`)
-})
+  console.log(`Server is running on port: ${PORT}`);
+});

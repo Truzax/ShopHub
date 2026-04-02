@@ -1,2 +1,18 @@
-<h1>Hi! there.</h1>
-<router-outlet />
+<div class="bg-gray-800 text-white sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <div class="flex items-center gap-4">
+                <h1 class="text-lg font-bold">E-Commerce Analytics</h1>
+            </div>
+            <ul class="flex gap-6">
+                <li><a routerLink="/" class="text-gray-300 hover:text-white">Dashboard</a></li>
+                <li><a routerLink="/products" class="text-gray-300 hover:text-white">Products</a></li>
+                <li><a routerLink="/orders" class="text-gray-300 hover:text-white">Orders</a></li>
+                <li><a routerLink="/reports" class="text-gray-300 hover:text-white">Reports</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<main class="max-w-7xl mx-auto p-6">
+    <router-outlet />
+</main>
