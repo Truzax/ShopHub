@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const usersRoute = require('./routes/users');
+const authRoute = require('./routes/auth');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -20,6 +21,7 @@ app.get('/', (req, res) => res.send('Server is running'));
 
 // API routes
 app.use('/api/users', usersRoute);
+app.use('/api/auth', authRoute);
 
 // Error handler
 app.use(errorHandler);
