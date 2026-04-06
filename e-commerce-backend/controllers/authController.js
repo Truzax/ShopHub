@@ -2,7 +2,7 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
 function generateToken(user) {
-  return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET || 'changeme', {
+  return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET || '0c4d2862e59353ceda3e54136364b342a4e32615b9ed8600dc2019f593f04fa6d900787635cbc7d89d0d0d16ad6aca9479d553c4167ce6d284aef5de52ddcd0a', {
     expiresIn: process.env.JWT_EXPIRES_IN || '1h'
   });
 }
