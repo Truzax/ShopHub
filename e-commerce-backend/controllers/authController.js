@@ -1,10 +1,27 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
-function generateToken(user) {
-  return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET || '0c4d2862e59353ceda3e54136364b342a4e32615b9ed8600dc2019f593f04fa6d900787635cbc7d89d0d0d16ad6aca9479d553c4167ce6d284aef5de52ddcd0a', {
-    expiresIn: process.env.JWT_EXPIRES_IN || '1h'
+const ACCESS_TOKEN_EXPIRES = process.env.JWT_EXPIRES_IN || '15m';
+const REFRESH_TOKEN_EXPIRES_MS = parseInt(process.env.REFRESH_TOKEN_EXPIRES_MS || String(7 * 24 * 60 * 60 * 1000), 10); // 7 days
+
+function generateAccessToken(user) {
+  return jwt.sign({ id: user._id, role: user.role, name: user.name, email: user.email }, process.env.JWT_SECRET || 'default_access_secret', {
+    expiresIn: ACCESS_TOKEN_EXPIRES,
   });
+}
+
+function generateRefreshToken() {
+  return crypto.randomBytes(64).toString('hex');
+}
+
+function cookieOptions() {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: REFRESH_TOKEN_EXPIRES_MS,
+  };
 }
 
 exports.signup = async (req, res, next) => {
@@ -26,10 +43,17 @@ exports.signup = async (req, res, next) => {
     const user = new User({ name, email, password, role: normalizedRole });
     await user.save();
 
-    const token = generateToken(user);
+    // create tokens
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken();
+    await user.addRefreshToken(refreshToken);
+
+    // set httpOnly cookie for refresh token
+    res.cookie('refreshToken', refreshToken, cookieOptions());
+
     res.status(201).json({
       user: { id: user._id, name: user.name, email: user.email, role: user.role },
-      token
+      token: accessToken,
     });
   } catch (err) {
     next(err);
@@ -47,8 +71,51 @@ exports.login = async (req, res, next) => {
     const valid = await user.comparePassword(password);
     if (!valid) return res.status(401).json({ message: 'Invalid credentials' });
 
-    const token = generateToken(user);
-    res.json({ user: { id: user._id, name: user.name, email: user.email, role: user.role }, token });
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken();
+    await user.addRefreshToken(refreshToken);
+
+    res.cookie('refreshToken', refreshToken, cookieOptions());
+
+    res.json({ user: { id: user._id, name: user.name, email: user.email, role: user.role }, token: accessToken });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Rotate refresh token and return new access token
+exports.refresh = async (req, res, next) => {
+  try {
+    const token = req.cookies && req.cookies.refreshToken;
+    if (!token) return res.status(401).json({ message: 'No refresh token provided' });
+
+    const hashed = crypto.createHash('sha256').update(token).digest('hex');
+    const user = await User.findOne({ 'refreshTokens.token': hashed });
+    if (!user) return res.status(401).json({ message: 'Invalid refresh token' });
+
+    // rotate
+    await user.removeRefreshToken(token);
+    const newRefresh = generateRefreshToken();
+    await user.addRefreshToken(newRefresh);
+
+    const accessToken = generateAccessToken(user);
+    res.cookie('refreshToken', newRefresh, cookieOptions());
+    res.json({ token: accessToken, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.logout = async (req, res, next) => {
+  try {
+    const token = req.cookies && req.cookies.refreshToken;
+    if (token) {
+      const hashed = crypto.createHash('sha256').update(token).digest('hex');
+      const user = await User.findOne({ 'refreshTokens.token': hashed });
+      if (user) await user.removeRefreshToken(token);
+    }
+    res.clearCookie('refreshToken', cookieOptions());
+    res.status(204).end();
   } catch (err) {
     next(err);
   }

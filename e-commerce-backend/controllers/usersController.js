@@ -8,3 +8,12 @@ exports.getUsers = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getProfile = async (req, res, next) => {
+  try {
+    if (!req.user) return res.status(401).json({ message: 'Not authenticated' });
+    res.json(req.user);
+  } catch (err) {
+    next(err);
+  }
+};
