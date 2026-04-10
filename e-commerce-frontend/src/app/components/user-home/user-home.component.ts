@@ -6,11 +6,11 @@ import { MatCardModule } from '@angular/material/card';
   selector: 'app-user-home',
   imports: [MatCardModule],
   template: `
-    <div class="p-6">
-      <mat-card>
+    <div>
+      <mat-card class="p-5">
         <mat-card-title>Welcome, {{ userName }}</mat-card-title>
         <mat-card-content>
-          <p>This is the normal user view. You do not have admin access to the main dashboard.</p>
+          <p class="py-3">This is the normal user view. You do not have admin access to the main dashboard.</p>
         </mat-card-content>
       </mat-card>
     </div>
