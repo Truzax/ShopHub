@@ -8,7 +8,9 @@ import cookieParser from 'cookie-parser';
 import connectDB from './config/db';
 import usersRoute from './routes/users';
 import authRoute from './routes/auth';
-import errorHandler from './middleware/errorHandler';
+import productsRoute from './routes/products';
+import ordersRoute from './routes/orders';
+import errorHandler from './utils/errorHandler';
 
 const app = express();
 app.use(express.json());
@@ -26,6 +28,8 @@ app.get('/', (req, res) => res.send('Server is running'));
 // API routes
 app.use('/api/users', usersRoute);
 app.use('/api/auth', authRoute);
+app.use('/api/products', productsRoute);
+app.use('/api/orders', ordersRoute);
 
 // Error handler
 app.use(errorHandler);
