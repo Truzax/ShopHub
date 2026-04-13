@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, ChangeDetectorRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -25,7 +25,7 @@ export class Login {
   emailErrorMessage = signal('');
   passwordErrorMessage = signal('');
 
-  constructor(private fb: FormBuilder, private auth: AuthService, public router: Router) {
+  constructor(private fb: FormBuilder, private auth: AuthService, public router: Router, private cdr: ChangeDetectorRef) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
@@ -38,7 +38,11 @@ export class Login {
       this.loginForm.controls.password.valueChanges
     )
       .pipe(takeUntilDestroyed())
-      .subscribe(() => this.updateErrorMessages());
+      .subscribe(() => {
+        this.error = null;
+        this.updateErrorMessages();
+        this.cdr.markForCheck();
+      });
   }
 
   updateErrorMessages() {
@@ -76,7 +80,10 @@ export class Login {
           this.router.navigate(['/home']);
         }
       },
-      error: (err) => (this.error = err?.error?.message || 'Login failed'),
+      error: (err) => {
+        this.error = err?.error?.message || 'Login failed';
+        this.cdr.detectChanges();
+      },
     });
   }
 }

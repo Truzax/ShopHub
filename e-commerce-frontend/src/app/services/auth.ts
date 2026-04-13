@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -27,6 +27,23 @@ export class AuthService {
         if (res && res.token) localStorage.setItem('access_token', res.token);
       })
     );
+  }
+
+  forgotPassword(email: string) {
+    return this.http.post<any>(`${this.baseAuth}/forgot-password`, { email }, { withCredentials: true });
+  }
+
+  resetPassword(payload: { email: string; token: string; password: string }) {
+    return this.http.post<any>(`${this.baseAuth}/reset-password`, payload, { withCredentials: true }).pipe(
+      tap((res) => {
+        if (res && res.token) localStorage.setItem('access_token', res.token);
+      })
+    );
+  }
+
+  validateReset(token: string, email: string) {
+    const params = new HttpParams().set('token', token).set('email', email);
+    return this.http.get<any>(`${this.baseAuth}/validate-reset`, { params, withCredentials: true });
   }
 
   logout() {

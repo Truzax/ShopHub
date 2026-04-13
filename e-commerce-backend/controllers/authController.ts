@@ -178,7 +178,7 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
 
     // Not configured: expose link in response for development/testing and log
     console.log('Password reset link:', resetUrl);
-    return res.json({ message: 'Reset link generated', resetUrl });
+    return res.json({ message: 'Reset link generated'});
   } catch (err) {
     next(err);
   }
