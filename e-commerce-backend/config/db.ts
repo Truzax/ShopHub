@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-const connectDB = async () => {
+const connectDB = async (): Promise<void> => {
   const MONGO_URI = process.env.MONGO_URI;
   if (!MONGO_URI) {
     throw new Error('MONGO_URI not defined in environment');
@@ -9,4 +9,4 @@ const connectDB = async () => {
   console.log('Mongodb connected!');
 };
 
-module.exports = connectDB;
+export default connectDB;

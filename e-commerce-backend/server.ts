@@ -1,12 +1,14 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
-const express = require('express');
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
-const connectDB = require('./config/db');
-const usersRoute = require('./routes/users');
-const authRoute = require('./routes/auth');
-const errorHandler = require('./middleware/errorHandler');
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+
+import connectDB from './config/db';
+import usersRoute from './routes/users';
+import authRoute from './routes/auth';
+import errorHandler from './middleware/errorHandler';
 
 const app = express();
 app.use(express.json());
@@ -16,7 +18,7 @@ app.use(cookieParser());
 const PORT = process.env.PORT || 3001;
 
 // Connect to MongoDB
-connectDB().catch(err => console.error('DB connection error:', err));
+connectDB().catch((err) => console.error('DB connection error:', err));
 
 // Base route
 app.get('/', (req, res) => res.send('Server is running'));
