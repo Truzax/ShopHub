@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, signal } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -7,11 +7,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   standalone: true,
   selector: 'app-reset-password',
-  imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatCardModule, RouterLink],
+  imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatCardModule, RouterLink, MatIconModule],
   templateUrl: './reset-password.html',
 })
 export class ResetPassword {
@@ -21,6 +22,8 @@ export class ResetPassword {
   token: string | null = null;
   email: string | null = null;
   valid: boolean | null = null;
+  hide = signal(true);
+  hideConfirm = signal(true);
 
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private auth: AuthService, private router: Router, private cdr: ChangeDetectorRef) {
     this.resetForm = this.fb.group({ password: ['', [Validators.required, Validators.minLength(6)]], confirm: ['', [Validators.required]] });
@@ -54,6 +57,16 @@ export class ResetPassword {
       this.message = null;
       this.cdr.markForCheck();
     });
+  }
+
+  clickEvent(event: MouseEvent) {
+    this.hide.set(!this.hide());
+    event.stopPropagation();
+  }
+
+  clickConfirmEvent(event: MouseEvent) {
+    this.hideConfirm.set(!this.hideConfirm());
+    event.stopPropagation();
   }
 
   onSubmit() {

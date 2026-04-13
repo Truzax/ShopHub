@@ -9,7 +9,7 @@ const ACCESS_TOKEN_EXPIRES = process.env.JWT_EXPIRES_IN || '15m';
 const REFRESH_TOKEN_EXPIRES_MS = parseInt(process.env.REFRESH_TOKEN_EXPIRES_MS || String(7 * 24 * 60 * 60 * 1000), 10); // 7 days
 
 function generateAccessToken(user: any) {
-  const secret: Secret = (process.env.JWT_SECRET ?? 'default_access_secret') as Secret;
+  const secret: Secret = (process.env.JWT_SECRET || '92850b16436cf9ef6648c30d9f3855e5f49efb11134a51625428067e105c90083f9828c9ab6f01ee65dc5a4af99cde013f81f73148dbc6156d1cc68471c58d68') as Secret;
   return jwt.sign({ id: user._id, role: user.role, name: user.name, email: user.email }, secret as any, {
     expiresIn: ACCESS_TOKEN_EXPIRES as any,
   }) as string;

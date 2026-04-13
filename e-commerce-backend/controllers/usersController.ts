@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 
 export const getUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const users = await User.find();
+    const users = await User.find().select('-password -refreshTokens -resetPasswordToken');
     res.json(users);
   } catch (err) {
     next(err);
