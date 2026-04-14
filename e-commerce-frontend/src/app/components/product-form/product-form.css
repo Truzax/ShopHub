@@ -1,0 +1,33 @@
+.product-form-container {
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+}
+
+mat-card {
+  width: 100%;
+  max-width: 600px;
+}
+
+.product-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.error-message {
+  color: red;
+  margin-bottom: 16px;
+}

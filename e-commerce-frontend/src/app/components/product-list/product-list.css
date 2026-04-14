@@ -1,0 +1,12 @@
+.product-list-container {
+  padding: 24px;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+table {
+  width: 100%;
+}

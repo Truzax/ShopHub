@@ -12,8 +12,13 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
       { path: 'dashboard', component: DashboardComponent, canActivate: [AdminGuard] },
+      { path: 'products', loadComponent: () => import('./components/product-list/product-list').then(m => m.ProductList), canActivate: [AdminGuard] },
+      { path: 'products/new', loadComponent: () => import('./components/product-form/product-form').then(m => m.ProductForm), canActivate: [AdminGuard] },
+      { path: 'products/edit/:id', loadComponent: () => import('./components/product-form/product-form').then(m => m.ProductForm), canActivate: [AdminGuard] },
+      { path: 'orders', loadComponent: () => import('./components/order-list/order-list').then(m => m.OrderList), canActivate: [AdminGuard] },
       { path: 'home', component: UserDashboard },
-      { path: '', redirectTo: 'home', pathMatch: 'full' } // AuthGuard will redirect if not authenticated, else home
+      { path: 'not-found', loadComponent: () => import('./components/not-found/not-found').then(m => m.NotFound) },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' } // AuthGuard will redirect if not authenticated, else home
     ]
   },
   { path: 'signup', loadComponent: () => import('./components/signup/signup').then(m => m.Signup) },
