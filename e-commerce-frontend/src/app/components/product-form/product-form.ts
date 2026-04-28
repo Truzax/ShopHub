@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -12,11 +13,11 @@ import { ProductService } from '../../services/product.service';
   selector: 'app-product-form',
   standalone: true,
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    MatCardModule, 
-    MatFormFieldModule, 
-    MatInputModule, 
+    CommonModule,
+    ReactiveFormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
     MatButtonModule,
     RouterModule
   ],
@@ -28,6 +29,7 @@ export class ProductForm implements OnInit {
   isEditMode = false;
   productId: string | null = null;
   errorMessage: string = '';
+  private destroyRef = inject(DestroyRef);
 
   constructor(
     private fb: FormBuilder,
@@ -47,7 +49,7 @@ export class ProductForm implements OnInit {
     this.productId = this.route.snapshot.paramMap.get('id');
     if (this.productId) {
       this.isEditMode = true;
-      this.productService.getProductById(this.productId).subscribe({
+      this.productService.getProductById(this.productId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (product) => {
           this.productForm.patchValue(product);
         },
@@ -62,12 +64,12 @@ export class ProductForm implements OnInit {
     if (this.productForm.valid) {
       const productData = this.productForm.value;
       if (this.isEditMode && this.productId) {
-        this.productService.updateProduct(this.productId, productData).subscribe({
+        this.productService.updateProduct(this.productId, productData).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
           next: () => this.router.navigate(['/products']),
           error: (err) => this.errorMessage = 'Failed to update product'
         });
       } else {
-        this.productService.createProduct(productData).subscribe({
+        this.productService.createProduct(productData).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
           next: () => this.router.navigate(['/products']),
           error: (err) => this.errorMessage = 'Failed to create product'
         });

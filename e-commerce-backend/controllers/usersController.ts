@@ -3,8 +3,25 @@ import { Request, Response, NextFunction } from 'express';
 
 export const getUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const users = await User.find().select('-password -refreshTokens -resetPasswordToken');
-    res.json(users);
+    const page = parseInt(req.query.page as string, 10) || 1;
+    const limit = parseInt(req.query.limit as string, 10) || 10;
+    const skip = (page - 1) * limit;
+
+    const users = await User.find()
+      .select('-password -refreshTokens -resetPasswordToken')
+      .skip(skip)
+      .limit(limit);
+    
+    const total = await User.countDocuments();
+
+    res.json({
+      success: true,
+      count: users.length,
+      total,
+      page,
+      pages: Math.ceil(total / limit),
+      data: users
+    });
   } catch (err) {
     next(err);
   }

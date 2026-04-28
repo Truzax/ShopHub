@@ -1,18 +1,23 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Order } from '../models/order.model';
+import { environment } from '../../environments/environment';
+import { PaginatedResponse } from '../models/paginated-response.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrderService {
-  private baseUrl = 'http://localhost:3000/api/orders';
+  private baseUrl = `${environment.apiUrl}/orders`;
 
   constructor(private http: HttpClient) {}
 
-  getOrders(): Observable<Order[]> {
-    return this.http.get<Order[]>(this.baseUrl);
+  getOrders(page: number = 1, limit: number = 10): Observable<PaginatedResponse<Order>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString());
+    return this.http.get<PaginatedResponse<Order>>(this.baseUrl, { params });
   }
 
   getOrderById(id: string): Observable<Order> {

@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatButtonModule } from '@angular/material/button';
+import { RouterModule } from '@angular/router';
 
 @Component({
   standalone: true,
   selector: 'app-dashboard-component',
-  imports: [MatCardModule, MatSnackBarModule],
+  imports: [MatCardModule, MatSnackBarModule, MatButtonModule, RouterModule],
   templateUrl: './dashboard-component.html',
   styleUrls: ['./dashboard-component.css'],
 })

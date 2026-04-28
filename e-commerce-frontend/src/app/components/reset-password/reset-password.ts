@@ -91,7 +91,7 @@ export class ResetPassword {
 
     this.auth.resetPassword({ email: this.email, token: this.token, password }).subscribe({
       next: (res) => {
-        this.message = res?.message || 'Password reset successful';
+        this.message = (res as any)?.message || 'Password reset successful';
         this.cdr.detectChanges();
         setTimeout(() => this.router.navigate(['/reset-confirmation']), 800);
       },

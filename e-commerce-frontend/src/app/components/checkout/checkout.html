@@ -1,0 +1,84 @@
+<div class="checkout-container">
+  <div class="checkout-content">
+    <!-- Left column: Order Summary -->
+    <div class="order-summary">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Order Summary</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="summary-section">
+            <h3>Items</h3>
+            <div *ngFor="let item of cart.items" class="summary-item">
+              <div class="item-details">
+                <span class="item-name">{{ item.product.name }}</span>
+                <span class="item-qty">x{{ item.quantity }}</span>
+              </div>
+              <span class="item-price">
+                {{ (item.product.price * item.quantity) | currency : 'INR' : 'symbol' : '1.0-2' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="summary-section">
+            <h3>Billing Address</h3>
+            <p *ngIf="currentUser">
+              {{ currentUser.fullName }}<br />
+              {{ currentUser.email }}<br />
+              {{ currentUser.phone || 'N/A' }}
+            </p>
+          </div>
+
+          <div class="order-total">
+            <span class="label">Order Total:</span>
+            <span class="value">{{ cart.total | currency : 'INR' : 'symbol' : '1.0-2' }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Right column: Confirmation -->
+    <div class="confirmation-section">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Confirm Order</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="confirmation-details">
+            <h3>Order Details</h3>
+            <p><strong>Total Items:</strong> {{ cart.items.length }}</p>
+            <p><strong>Total Amount:</strong> {{ cart.total | currency : 'INR' : 'symbol' : '1.0-2' }}</p>
+            <p><strong>Customer:</strong> {{ currentUser?.fullName }}</p>
+            <p><strong>Email:</strong> {{ currentUser?.email }}</p>
+
+            <div class="confirmation-note">
+              <p>
+                By clicking "Place Order", you agree to place this order for the amount shown above.
+                You will receive an order confirmation email shortly.
+              </p>
+            </div>
+
+            <div *ngIf="isLoading" class="loading">
+              <mat-spinner [diameter]="40"></mat-spinner>
+              <p>Processing your order...</p>
+            </div>
+
+            <div *ngIf="!isLoading" class="action-buttons">
+              <button mat-raised-button color="warn" (click)="cancelOrder()">
+                Cancel
+              </button>
+              <button
+                mat-raised-button
+                color="primary"
+                (click)="placeOrder()"
+                [disabled]="cart.items.length === 0 || isLoading"
+              >
+                Place Order
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

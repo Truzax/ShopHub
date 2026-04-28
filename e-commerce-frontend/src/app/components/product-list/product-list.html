@@ -1,9 +1,9 @@
 <div class="product-list-container">
   <div class="header">
     <h2>Products</h2>
-    <a routerLink="/products/new" mat-raised-button color="primary">Add Product</a>
+    <a *ngIf="isAdmin" routerLink="/products/new" mat-raised-button color="primary">Add Product</a>
   </div>
-  
+
   <table mat-table [dataSource]="products" class="mat-elevation-z8">
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef> Name </th>
@@ -25,6 +25,7 @@
       <td mat-cell *matCellDef="let product"> {{product.stock}} </td>
     </ng-container>
 
+    <!-- Admin Actions Column -->
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef> Actions </th>
       <td mat-cell *matCellDef="let product">
@@ -33,7 +34,46 @@
       </td>
     </ng-container>
 
+    <!-- Quantity Column (for non-admin users) -->
+    <ng-container matColumnDef="quantity">
+      <th mat-header-cell *matHeaderCellDef> Quantity </th>
+      <td mat-cell *matCellDef="let product">
+        <input
+          type="number"
+          min="1"
+          [max]="product.stock"
+          [(ngModel)]="quantities[getProductId(product)]"
+          class="quantity-input"
+        />
+      </td>
+    </ng-container>
+
+    <!-- Add to Cart Column (for non-admin users) -->
+    <ng-container matColumnDef="cartActions">
+      <th mat-header-cell *matHeaderCellDef> Actions </th>
+      <td mat-cell *matCellDef="let product">
+        <button
+          mat-raised-button
+          color="accent"
+          (click)="addToCart(product)"
+          [disabled]="product.stock <= 0"
+        >
+          <mat-icon>shopping_cart</mat-icon>
+          Add to Cart
+        </button>
+      </td>
+    </ng-container>
+
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
+
+  <mat-paginator
+    [length]="totalItems"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[5, 10, 25, 100]"
+    [pageIndex]="currentPage - 1"
+    (page)="onPageChange($event)"
+    aria-label="Select page">
+  </mat-paginator>
 </div>

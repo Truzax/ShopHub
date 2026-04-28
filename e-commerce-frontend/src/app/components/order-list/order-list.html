@@ -2,7 +2,7 @@
   <div class="header">
     <h2>Orders</h2>
   </div>
-  
+
   <table mat-table [dataSource]="orders" class="mat-elevation-z8">
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef> Order ID </th>
@@ -11,7 +11,7 @@
 
     <ng-container matColumnDef="user">
       <th mat-header-cell *matHeaderCellDef> User </th>
-      <td mat-cell *matCellDef="let order"> {{order.user?.username || order.user}} </td>
+      <td mat-cell *matCellDef="let order"> {{order.user?.name || order.user}} </td>
     </ng-container>
 
     <ng-container matColumnDef="total">
@@ -22,13 +22,14 @@
     <ng-container matColumnDef="status">
       <th mat-header-cell *matHeaderCellDef> Status </th>
       <td mat-cell *matCellDef="let order">
-        <mat-form-field appearance="fill" class="status-select">
+        <mat-form-field appearance="fill" class="status-select" *ngIf="isAdmin">
           <mat-select [ngModel]="order.status" (ngModelChange)="updateStatus(order, $event)">
             <mat-option *ngFor="let status of statusOptions" [value]="status">
               {{ status | titlecase }}
             </mat-option>
           </mat-select>
         </mat-form-field>
+        <span *ngIf="!isAdmin">{{ order.status | titlecase }}</span>
       </td>
     </ng-container>
 
@@ -40,4 +41,13 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
+
+  <mat-paginator
+    [length]="totalItems"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[5, 10, 25, 100]"
+    [pageIndex]="currentPage - 1"
+    (page)="onPageChange($event)"
+    aria-label="Select page">
+  </mat-paginator>
 </div>

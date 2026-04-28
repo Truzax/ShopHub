@@ -1,6 +1,14 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+const requiredEnv = ['JWT_SECRET', 'MONGO_URI'];
+for (const env of requiredEnv) {
+  if (!process.env[env]) {
+    console.error(`FATAL ERROR: ${env} is not defined in environment variables.`);
+    process.exit(1);
+  }
+}
+
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';

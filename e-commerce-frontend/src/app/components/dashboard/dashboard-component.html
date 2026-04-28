@@ -1,6 +1,8 @@
 <mat-card class="p-5">
 	<mat-card-title >Dashboard</mat-card-title>
 	<mat-card-content class="p-0" >
-		<p class="py-3">Welcome to the dashboard.</p>
-	</mat-card-content>
-</mat-card>
+                <p class="py-3">Welcome to the dashboard. You have admin access.</p>
+                <div style="display: flex; gap: 1rem;">
+                    <a mat-raised-button color="primary" routerLink="/products">Manage Products</a>
+                    <a mat-raised-button color="accent" routerLink="/orders">Manage Orders</a>
+                </div>

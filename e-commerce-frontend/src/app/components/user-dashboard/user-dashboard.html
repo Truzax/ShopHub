@@ -3,6 +3,10 @@
         <mat-card-title>Welcome, User</mat-card-title>
         <mat-card-content>
             <p class="py-3">This is the normal user view. You do not have admin access to the main dashboard.</p>
+            <div style="display: flex; gap: 1rem;">
+                <a mat-raised-button color="primary" routerLink="/products">View Products</a>
+                <a mat-raised-button color="accent" routerLink="/orders">My Orders</a>
+            </div>
         </mat-card-content>
     </mat-card>
 </div>

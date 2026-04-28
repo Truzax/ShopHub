@@ -1,30 +1,73 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of } from 'rxjs';
+import { tap, catchError, map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  user: User;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private baseAuth = 'http://localhost:3000/api/auth';
-  private baseUsers = 'http://localhost:3000/api/users';
+  private baseAuth = `${environment.apiUrl}/auth`;
+  private baseUsers = `${environment.apiUrl}/users`;
+
+  private currentUserSubject = new BehaviorSubject<User | null>(null);
+  public currentUser$ = this.currentUserSubject.asObservable();
+
+  private initialized = false;
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  login(email: string, password: string): Observable<any> {
-    return this.http.post<any>(`${this.baseAuth}/login`, { email, password }, { withCredentials: true }).pipe(
+  // Initialize the user state from the server if a token exists
+  initializeAuth(): Observable<any> {
+      if (!this.getAccessToken()) {
+          this.initialized = true;
+          return of(null);
+      }
+      return this.getProfile().pipe(
+          tap(user => {
+              this.currentUserSubject.next(user);
+              this.initialized = true;
+          }),
+          catchError(() => {
+              this.logoutLocally();
+              this.initialized = true;
+              return of(null);
+          })
+      );
+  }
+
+  login(email: string, password: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.baseAuth}/login`, { email, password }, { withCredentials: true }).pipe(
       tap((res) => {
-        if (res && res.token) localStorage.setItem('access_token', res.token);
+        if (res && res.token) {
+            localStorage.setItem('access_token', res.token);
+            this.currentUserSubject.next(res.user);
+        }
       })
     );
   }
 
-  signup(payload: { name: string; email: string; password: string }) {
-    return this.http.post<any>(`${this.baseAuth}/signup`, payload, { withCredentials: true }).pipe(
+  signup(payload: { name: string; email: string; password: string }): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.baseAuth}/signup`, payload, { withCredentials: true }).pipe(
       tap((res) => {
-        if (res && res.token) localStorage.setItem('access_token', res.token);
+        if (res && res.token) {
+            localStorage.setItem('access_token', res.token);
+            this.currentUserSubject.next(res.user);
+        }
       })
     );
   }
@@ -33,10 +76,13 @@ export class AuthService {
     return this.http.post<any>(`${this.baseAuth}/forgot-password`, { email }, { withCredentials: true });
   }
 
-  resetPassword(payload: { email: string; token: string; password: string }) {
-    return this.http.post<any>(`${this.baseAuth}/reset-password`, payload, { withCredentials: true }).pipe(
+  resetPassword(payload: { email: string; token: string; password: string }): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.baseAuth}/reset-password`, payload, { withCredentials: true }).pipe(
       tap((res) => {
-        if (res && res.token) localStorage.setItem('access_token', res.token);
+        if (res && res.token) {
+            localStorage.setItem('access_token', res.token);
+            this.currentUserSubject.next(res.user);
+        }
       })
     );
   }
@@ -49,16 +95,32 @@ export class AuthService {
   logout() {
     return this.http.post(`${this.baseAuth}/logout`, {}, { withCredentials: true }).pipe(
       tap(() => {
-        localStorage.removeItem('access_token');
-        this.router.navigate(['/login']);
+        this.logoutLocally();
+      }),
+      catchError(() => {
+        this.logoutLocally();
+        return of(null);
       })
     );
   }
 
-  refresh() {
-    return this.http.post<any>(`${this.baseAuth}/refresh`, {}, { withCredentials: true }).pipe(
+  private logoutLocally() {
+      localStorage.removeItem('access_token');
+      this.currentUserSubject.next(null);
+      this.router.navigate(['/login']);
+  }
+
+  refresh(): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.baseAuth}/refresh`, {}, { withCredentials: true }).pipe(
       tap((res) => {
-        if (res && res.token) localStorage.setItem('access_token', res.token);
+        if (res && res.token) {
+            localStorage.setItem('access_token', res.token);
+            this.currentUserSubject.next(res.user);
+        }
+      }),
+      catchError((error) => {
+          this.logoutLocally();
+          throw error;
       })
     );
   }
@@ -75,27 +137,13 @@ export class AuthService {
     return !!this.getAccessToken();
   }
 
-  getUser(): any {
-    const token = this.getAccessToken();
-    if (!token) return null;
-    try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      );
-      return JSON.parse(jsonPayload);
-    } catch {
-      return null;
-    }
+  getUserValue(): User | null {
+      return this.currentUserSubject.value;
   }
 
-  getProfile() {
+  getProfile(): Observable<User> {
     const token = this.getAccessToken();
     const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;
-    return this.http.get<any>(`${this.baseUsers}/me`, { headers });
+    return this.http.get<User>(`${this.baseUsers}/me`, { headers });
   }
 }

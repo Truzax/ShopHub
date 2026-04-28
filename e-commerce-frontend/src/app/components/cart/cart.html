@@ -1,0 +1,85 @@
+<div class="cart-container">
+  <div class="header">
+    <h2>Shopping Cart</h2>
+  </div>
+
+  <div *ngIf="cart.items.length === 0" class="empty-cart">
+    <p>Your cart is empty</p>
+    <button mat-raised-button color="primary" (click)="continueShopping()">
+      Continue Shopping
+    </button>
+  </div>
+
+  <div *ngIf="cart.items.length > 0">
+    <table mat-table [dataSource]="cart.items" class="cart-table mat-elevation-z8">
+      <!-- Product Column -->
+      <ng-container matColumnDef="product">
+        <th mat-header-cell *matHeaderCellDef>Product</th>
+        <td mat-cell *matCellDef="let item">{{ item.product.name }}</td>
+      </ng-container>
+
+      <!-- Price Column -->
+      <ng-container matColumnDef="price">
+        <th mat-header-cell *matHeaderCellDef>Price</th>
+        <td mat-cell *matCellDef="let item">
+          {{ item.product.price | currency : 'INR' : 'symbol' : '1.0-2' }}
+        </td>
+      </ng-container>
+
+      <!-- Quantity Column -->
+      <ng-container matColumnDef="quantity">
+        <th mat-header-cell *matHeaderCellDef>Quantity</th>
+        <td mat-cell *matCellDef="let item">
+          <input
+            type="number"
+            min="1"
+            [(ngModel)]="item.quantity"
+            (change)="updateQuantity(getProductId(item.product), item.quantity)"
+            class="quantity-input"
+          />
+        </td>
+      </ng-container>
+
+      <!-- Subtotal Column -->
+      <ng-container matColumnDef="subtotal">
+        <th mat-header-cell *matHeaderCellDef>Subtotal</th>
+        <td mat-cell *matCellDef="let item">
+          {{ (item.product.price * item.quantity) | currency : 'INR' : 'symbol' : '1.0-2' }}
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let item">
+          <button
+            mat-icon-button
+            color="warn"
+            (click)="removeItem(getProductId(item.product))"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+
+    <div class="cart-summary">
+      <div class="summary-row">
+        <span class="label">Subtotal:</span>
+        <span class="value">{{ cart.total | currency : 'INR' : 'symbol' : '1.0-2' }}</span>
+      </div>
+      <div class="summary-row total">
+        <span class="label">Total:</span>
+        <span class="value">{{ cart.total | currency : 'INR' : 'symbol' : '1.0-2' }}</span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button mat-raised-button (click)="continueShopping()">Continue Shopping</button>
+      <button mat-raised-button color="primary" (click)="checkout()">Proceed to Checkout</button>
+    </div>
+  </div>
+</div>

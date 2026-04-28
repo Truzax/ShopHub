@@ -14,6 +14,7 @@ export interface IOrder extends Document {
     total: number;
     status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
     date: Date;
+    stockUpdated: boolean;
 }
 
 const OrderItemSchema = new Schema<IOrderItem>({
@@ -33,6 +34,7 @@ const OrderSchema = new Schema<IOrder>(
             default: 'pending' 
         },
         date: { type: Date, default: Date.now },
+        stockUpdated: { type: Boolean, default: false },
     },
     { timestamps: true }
 );
