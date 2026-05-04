@@ -1,8 +1,27 @@
-<mat-card class="p-5">
-	<mat-card-title >Dashboard</mat-card-title>
-	<mat-card-content class="p-0" >
-                <p class="py-3">Welcome to the dashboard. You have admin access.</p>
-                <div style="display: flex; gap: 1rem;">
-                    <a mat-raised-button color="primary" routerLink="/products">Manage Products</a>
-                    <a mat-raised-button color="accent" routerLink="/orders">Manage Orders</a>
-                </div>
+<mat-card class="p-5" *ngIf="currentUser$ | async as user">
+	<mat-card-title>Dashboard</mat-card-title>
+	<mat-card-content class="p-0">
+        <p class="py-3" *ngIf="user.role === 'admin'; else userView">
+            Welcome back, {{ user.name || user.email }}. You have admin access.
+        </p>
+
+        <ng-template #userView>
+            <p class="py-3">
+                Welcome back, {{ user.name || user.email }}. This is your user dashboard.
+            </p>
+        </ng-template>
+
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <ng-container *ngIf="user.role === 'admin'; else userActions">
+                <a mat-raised-button color="primary" routerLink="/products">Manage Products</a>
+                <a mat-raised-button color="accent" routerLink="/orders">Manage Orders</a>
+            </ng-container>
+
+            <ng-template #userActions>
+                <a mat-raised-button color="primary" routerLink="/products">View Products</a>
+                <a mat-raised-button color="accent" routerLink="/cart">View Cart</a>
+                <a mat-raised-button routerLink="/orders">My Orders</a>
+            </ng-template>
+        </div>
+	</mat-card-content>
+</mat-card>

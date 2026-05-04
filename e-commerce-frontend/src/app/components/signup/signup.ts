@@ -80,11 +80,7 @@ export class Signup {
     this.auth.signup({ name, email, password }).subscribe({
       next: (res) => {
         const user = res.user;
-        if (user?.role === 'admin') {
-          this.router.navigate(['/dashboard']);
-        } else {
-          this.router.navigate(['/home']);
-        }
+        this.router.navigate(['/dashboard']);
       },
       error: (err) => (this.error = err?.error?.message || 'Signup failed'),
     });

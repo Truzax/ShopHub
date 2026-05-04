@@ -72,13 +72,8 @@ export class Login {
     if (this.loginForm.invalid) return;
     const { email, password } = this.loginForm.value as { email: string; password: string };
     this.auth.login(email, password).subscribe({
-      next: (res) => {
-        const user = res.user;
-        if (user?.role === 'admin') {
-          this.router.navigate(['/dashboard']);
-        } else {
-          this.router.navigate(['/home']);
-        }
+      next: () => {
+        this.router.navigate(['/dashboard']);
       },
       error: (err) => {
         this.error = err?.error?.message || 'Login failed';
