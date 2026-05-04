@@ -39,4 +39,9 @@ const OrderSchema = new Schema<IOrder>(
     { timestamps: true }
 );
 
+    // Add indexes for analytics aggregation performance
+    OrderSchema.index({ date: 1, status: 1 });
+    OrderSchema.index({ 'products.product': 1 });
+    OrderSchema.index({ status: 1 });
+
 export default mongoose.model<IOrder>('Order', OrderSchema);

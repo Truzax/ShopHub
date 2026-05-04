@@ -17,4 +17,7 @@ const ProductSchema = new Schema<IProduct>(
     { timestamps: true }
 );
 
+    // Add index for analytics category filtering
+    ProductSchema.index({ category: 1 });
+
 export default mongoose.model<IProduct>('Product', ProductSchema);

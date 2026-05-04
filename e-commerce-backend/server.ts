@@ -18,6 +18,7 @@ import usersRoute from './routes/users';
 import authRoute from './routes/auth';
 import productsRoute from './routes/products';
 import ordersRoute from './routes/orders';
+import analyticsRoute from './routes/analytics';
 import errorHandler from './utils/errorHandler';
 
 const app = express();
@@ -38,6 +39,7 @@ app.use('/api/users', usersRoute);
 app.use('/api/auth', authRoute);
 app.use('/api/products', productsRoute);
 app.use('/api/orders', ordersRoute);
+app.use('/api/dashboard', analyticsRoute);
 
 // Error handler
 app.use(errorHandler);
