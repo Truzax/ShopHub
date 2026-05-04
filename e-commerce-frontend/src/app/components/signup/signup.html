@@ -1,68 +1,58 @@
-<div class="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-indigo-900 via-purple-800 to-slate-900">
-  <mat-card class="w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl bg-white/5 backdrop-blur-sm border border-white/10">
-    <div class="grid grid-cols-1 md:grid-cols-2">
-      <div class="hidden md:flex flex-col justify-center gap-4 p-10 bg-gradient-to-br from-indigo-700 to-purple-700 text-white">
-        <div class="flex items-center gap-4">
-          <div class="h-12 w-12 rounded-full bg-white/10 flex items-center justify-center shadow-md">
-            <svg class="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 12l4 4L21 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </div>
-          <div>
-            <div class="text-2xl font-bold">E‑Com Analytics</div>
-            <div class="text-sm text-white/80">Create your account</div>
-          </div>
-        </div>
-        <p class="text-sm text-white/80">Get premium dashboards, alerts, and insights to grow your business.</p>
-        <ul class="mt-4 space-y-2 text-white/80">
-          <li class="flex items-center gap-3"><span class="inline-block w-2 h-2 rounded-full bg-emerald-400" aria-hidden="true"></span>Fast setup</li>
-          <li class="flex items-center gap-3"><span class="inline-block w-2 h-2 rounded-full bg-amber-400" aria-hidden="true"></span>Enterprise-grade security</li>
-          <li class="flex items-center gap-3"><span class="inline-block w-2 h-2 rounded-full bg-sky-400" aria-hidden="true"></span>Custom reports</li>
-        </ul>
-      </div>
+<div class="auth-bg">
+  <div class="auth-card">
+    <div class="auth-card-header">
+      <h1>Create Account</h1>
+      <p>Sign up to start shopping with us</p>
+    </div>
 
-      <div class="p-5 md:p-10 bg-transparent">
-        <div class="flex items-center justify-center md:justify-start mb-5">
-          <h1 class="text-2xl md:text-3xl font-bold text-white">Create account</h1>
-        </div>
+    <div class="auth-card-content">
+      @if (error) {
+        <div class="p-3 mb-4 rounded-lg text-sm" style="background-color:#fee2e2;color:#991b1b;">{{ error }}</div>
+      }
 
-        @if (error) {
-          <mat-error class="text-red-300 mb-3 block">{{ error }}</mat-error>
-        }
-
-        <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" novalidate class="space-y-4">
-          <mat-form-field appearance="outline" class="w-full mb-2">
-            <mat-label>Name</mat-label>
-            <input matInput formControlName="name" (blur)="updateErrorMessages()" aria-label="Name" aria-describedby="name-error" />
+      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" novalidate class="space-y-4">
+        <div>
+          <label class="ref-label" for="signup-name">Full Name</label>
+          <mat-form-field appearance="outline" class="w-full">
+            <input matInput id="signup-name" formControlName="name" placeholder="John Doe" (blur)="updateErrorMessages()" />
             @if (signupForm.controls.name.invalid) {
-              <mat-error id="name-error">{{ nameErrorMessage() }}</mat-error>
+              <mat-error>{{ nameErrorMessage() }}</mat-error>
             }
           </mat-form-field>
+        </div>
 
-          <mat-form-field appearance="outline" class="w-full mb-2">
-            <mat-label>Email</mat-label>
-            <input matInput type="email" formControlName="email" (blur)="updateErrorMessages()" aria-label="Email" aria-describedby="email-error" />
+        <div>
+          <label class="ref-label" for="signup-email">Email</label>
+          <mat-form-field appearance="outline" class="w-full">
+            <input matInput id="signup-email" type="email" formControlName="email" placeholder="you@example.com" (blur)="updateErrorMessages()" />
             @if (signupForm.controls.email.invalid) {
-              <mat-error id="email-error">{{ emailErrorMessage() }}</mat-error>
+              <mat-error>{{ emailErrorMessage() }}</mat-error>
             }
           </mat-form-field>
+        </div>
 
-          <mat-form-field appearance="outline" class="w-full mb-2">
-            <mat-label>Password</mat-label>
-            <input matInput [type]="hide() ? 'password' : 'text'" formControlName="password" (blur)="updateErrorMessages()" aria-label="Password" aria-describedby="password-error" />
-            <button type="button" mat-icon-button matSuffix (click)="clickEvent($event)" aria-label="Toggle password visibility" [attr.aria-pressed]="hide()">
+        <div>
+          <label class="ref-label" for="signup-password">Password</label>
+          <mat-form-field appearance="outline" class="w-full">
+            <input matInput id="signup-password" [type]="hide() ? 'password' : 'text'" formControlName="password" placeholder="••••••••" (blur)="updateErrorMessages()" />
+            <button type="button" mat-icon-button matSuffix (click)="clickEvent($event)" [attr.aria-label]="'Toggle password visibility'">
               <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
             </button>
             @if (signupForm.controls.password.invalid) {
-              <mat-error id="password-error">{{ passwordErrorMessage() }}</mat-error>
+              <mat-error>{{ passwordErrorMessage() }}</mat-error>
             }
           </mat-form-field>
+        </div>
 
-          <button mat-raised-button type="submit" [disabled]="signupForm.invalid" class="w-full py-3 rounded-lg text-white font-semibold bg-gradient-to-r from-rose-500 via-fuchsia-600 to-indigo-600 hover:scale-[1.02] transform transition">Sign up</button>
+        <button mat-raised-button type="submit" [disabled]="signupForm.invalid" class="w-full ref-btn ref-btn-primary ref-btn-lg" style="border-radius:calc(var(--radius) - 2px);">
+          Create Account
+        </button>
+      </form>
 
-          <div class="text-center mt-2 text-white/80 text-sm">Already have an account? <a routerLink="/login" class="text-blue-300 font-medium">Sign in</a></div>
-        </form>
+      <div class="text-center text-sm mt-4" style="color:var(--foreground);">
+        Already have an account?
+        <a routerLink="/login" class="cursor-pointer hover:underline font-medium" style="color:var(--primary);">Sign in</a>
       </div>
     </div>
-  </mat-card>
+  </div>
 </div>

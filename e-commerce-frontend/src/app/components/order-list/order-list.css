@@ -1,15 +1,1 @@
-.order-list-container {
-  padding: 24px;
-}
-
-.header {
-  margin-bottom: 24px;
-}
-
-table {
-  width: 100%;
-}
-
-.status-select {
-  width: 150px;
-}
+/* Order list now uses global ref-card and ref-table styles */

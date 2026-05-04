@@ -1,10 +1,12 @@
-﻿import { Component, OnInit, OnChanges, OnDestroy, SimpleChanges, Input, ViewChild, ElementRef, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, OnChanges, OnDestroy, SimpleChanges, Input, ViewChild, ElementRef, ChangeDetectionStrategy, inject } from '@angular/core';
 import { CommonModule, AsyncPipe, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subject, Observable, of, combineLatest, timer } from 'rxjs';
 import { debounceTime, switchMap, catchError, distinctUntilChanged, startWith } from 'rxjs/operators';
 import Chart from 'chart.js/auto';
@@ -44,8 +46,8 @@ export class RevenueChartComponent implements OnChanges, OnDestroy {
         datasets: [{
           label: 'Revenue',
           data: this.data.map(d => d.revenue),
-          borderColor: '#6366f1',
-          backgroundColor: 'rgba(99, 102, 241, 0.1)',
+          borderColor: '#4f46e5',
+          backgroundColor: 'rgba(79, 70, 229, 0.1)',
           fill: true,
           tension: 0.4
         }]
@@ -91,7 +93,7 @@ export class RevenueChartComponent implements OnChanges, OnDestroy {
 @Component({
   selector: 'app-dashboard-component',
   standalone: true,
-  imports: [CommonModule, FormsModule, RevenueChartComponent, HttpClientModule, MatCardModule, MatButtonModule, RouterModule, AsyncPipe, NgIf],
+  imports: [CommonModule, FormsModule, RevenueChartComponent, HttpClientModule, MatCardModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule, RouterModule, AsyncPipe, NgIf],
   templateUrl: './dashboard-component.html',
   styleUrls: ['./dashboard-component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush

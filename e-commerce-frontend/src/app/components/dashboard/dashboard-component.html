@@ -1,161 +1,179 @@
-﻿<mat-card class="p-5 mb-8" *ngIf="currentUser$ | async as user">
-    <mat-card-title>Dashboard</mat-card-title>
-    <mat-card-content class="p-0">
-        <p class="py-3" *ngIf="user.role === 'admin'; else userView">
-            Welcome back, {{ user.name || user.email }}. You have admin access.
-        </p>
-
-        <ng-template #userView>
-            <p class="py-3">
-                Welcome back, {{ user.name || user.email }}. This is your user dashboard.
-            </p>
-        </ng-template>
-
-        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-            <ng-container *ngIf="user.role === 'admin'; else userActions">
-                <a mat-raised-button color="primary" routerLink="/products">Manage Products</a>
-                <a mat-raised-button color="accent" routerLink="/orders">Manage Orders</a>
-            </ng-container>
-
-            <ng-template #userActions>
-                <a mat-raised-button color="primary" routerLink="/products">View Products</a>
-                <a mat-raised-button color="accent" routerLink="/cart">View Cart</a>
-                <a mat-raised-button routerLink="/orders">My Orders</a>
-            </ng-template>
+<div *ngIf="currentUser$ | async as user" class="animate-fade-in">
+  <!-- Welcome Card (Customer View) -->
+  <div *ngIf="user.role !== 'admin'" class="p-6">
+    <div class="ref-card">
+      <div class="ref-card-content">
+        <h2 class="mb-2">Welcome back, {{ user.name || user.email }}!</h2>
+        <p class="mb-4" style="color:var(--muted-foreground);">This is your dashboard. Browse products or check your orders.</p>
+        <div class="flex gap-3 flex-wrap">
+          <a routerLink="/products" class="ref-btn ref-btn-primary">View Products</a>
+          <a routerLink="/cart" class="ref-btn ref-btn-outline">View Cart</a>
+          <a routerLink="/orders" class="ref-btn ref-btn-outline">My Orders</a>
         </div>
-    </mat-card-content>
-</mat-card>
+      </div>
+    </div>
+  </div>
+</div>
 
-<!-- Analytics Dashboard Section (Admin Only) -->
+<!-- Analytics Dashboard (Admin Only) -->
 <ng-container *ngIf="(currentUser$ | async)?.role === 'admin'">
-  <div class="p-6 max-w-7xl mx-auto">
-    <header class="flex justify-between items-center flex-wrap gap-4 mb-8">
-      <h2 class="text-3xl font-bold text-white-800 tracking-tight">Analytics Dashboard</h2>
-      
-      <div class="flex flex-wrap gap-3 items-center bg-white p-2 rounded-lg shadow-sm border border-gray-100">
-        <input 
-          type="date" 
-          class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-gray-700" 
-          [(ngModel)]="filters.startDate" 
-          (ngModelChange)="applyFilters()" 
+  <div class="p-6 md:p-8 space-y-8 animate-fade-in">
+    <!-- Header -->
+    <div class="flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <h1>Dashboard</h1>
+        <p class="mt-1" style="color:var(--muted-foreground);">Welcome back! Here's what's happening today.</p>
+      </div>
+      <div class="flex flex-wrap gap-3 items-center">
+        <input
+          type="date"
+          class="ref-input"
+          style="width:auto;"
+          [(ngModel)]="filters.startDate"
+          (ngModelChange)="applyFilters()"
         />
-        <span class="text-gray-400 font-medium">to</span>
-        <input 
-          type="date" 
-          class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-gray-700" 
-          [(ngModel)]="filters.endDate" 
-          (ngModelChange)="applyFilters()" 
+        <span style="color:var(--muted-foreground);">to</span>
+        <input
+          type="date"
+          class="ref-input"
+          style="width:auto;"
+          [(ngModel)]="filters.endDate"
+          (ngModelChange)="applyFilters()"
         />
-        
-        <div class="h-6 w-px bg-gray-300 mx-1"></div>
-
-        <select 
-          class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-gray-700 bg-white" 
-          [(ngModel)]="filters.category" 
+        <select
+          class="ref-input"
+          style="width:auto;"
+          [(ngModel)]="filters.category"
           (ngModelChange)="applyFilters()">
           <option value="">All Categories</option>
           <option value="electronics">Electronics</option>
           <option value="clothing">Clothing</option>
         </select>
       </div>
-    </header>
+    </div>
 
-    <div class="bg-red-50 text-red-600 p-4 rounded-md mb-6 border border-red-200 flex items-center gap-2" *ngIf="errorMsg">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-      </svg>
+    <!-- Error -->
+    <div *ngIf="errorMsg" class="p-4 rounded-lg flex items-center gap-2" style="background-color:#fee2e2;color:#991b1b;">
+      <mat-icon style="font-size:1.25rem;width:1.25rem;height:1.25rem;">error</mat-icon>
       {{ errorMsg }}
     </div>
 
     <ng-container *ngIf="dashboardData$ | async as data; else loading">
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-        
-        <!-- Stats Widgets -->
-        <div class="col-span-1 md:col-span-12 grid grid-cols-2 md:grid-cols-6 gap-4">
-          <!-- Total Orders -->
-          <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex flex-col items-center justify-center relative overflow-hidden">
-            <div class="absolute top-0 w-full h-1 bg-indigo-600"></div>
-            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-1">Total</h3>
-            <p class="text-3xl font-extrabold text-gray-900 my-2">{{ data.totalOrders }}</p>
-          </div>
-          
-          <!-- Orders by Status -->
-          <ng-container *ngFor="let stat of data.ordersByStatus">
-            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex flex-col items-center justify-center relative overflow-hidden">
-              <div class="absolute top-0 w-full h-1" 
-                   [ngClass]="{
-                     'bg-yellow-400': stat.status === 'pending',
-                     'bg-blue-400': stat.status === 'processing',
-                     'bg-purple-400': stat.status === 'shipped',
-                     'bg-green-500': stat.status === 'delivered',
-                     'bg-red-500': stat.status === 'cancelled'
-                   }"></div>
-              <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-1">{{ stat.status }}</h3>
-              <p class="text-3xl font-extrabold text-gray-900 my-2">{{ stat.count }}</p>
+      <!-- KPI Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total Orders -->
+        <div class="kpi-card">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm" style="color:var(--muted-foreground);">Total Orders</p>
+              <h2 class="mt-2" style="font-size:1.75rem;font-weight:700;">{{ data.totalOrders }}</h2>
+              <div class="flex items-center gap-1 mt-2 text-sm" style="color:#059669;">
+                <mat-icon style="font-size:1rem;width:1rem;height:1rem;">trending_up</mat-icon>
+                <span>Active</span>
+              </div>
             </div>
-          </ng-container>
-        </div>
-
-        <!-- Chart View -->
-        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 col-span-1 md:col-span-8">
-          <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
-            </svg>
-            Revenue Over Time
-          </h3>
-          <div class="h-80 w-full flex justify-center items-center" *ngIf="data.revenueOverTime.length > 0; else noData">
-            <app-revenue-chart [data]="data.revenueOverTime"></app-revenue-chart>
-          </div>
-          <ng-template #noData>
-            <div class="h-80 flex flex-col items-center justify-center text-gray-400">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-3 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <p class="font-medium">No revenue data for this range.</p>
+            <div class="kpi-icon-box" style="background-color:color-mix(in srgb, var(--primary) 10%, transparent);">
+              <mat-icon style="font-size:1.5rem;width:1.5rem;height:1.5rem;color:var(--primary);">shopping_bag</mat-icon>
             </div>
-          </ng-template>
-        </div>
-
-        <!-- Top Products Table -->
-        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 col-span-1 md:col-span-4">
-          <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clip-rule="evenodd" />
-            </svg>
-            Top 5 Products
-          </h3>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-              <thead>
-                <tr class="border-b-2 border-gray-100">
-                  <th class="py-3 px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Product Name</th>
-                  <th class="py-3 px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Revenue</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-100">
-                <tr class="hover:bg-gray-50 transition-colors duration-150" *ngFor="let product of data.topProducts; trackBy: trackByName">
-                  <td class="py-4 px-2 text-sm text-gray-800 font-medium">{{ product.name }}</td>
-                  <td class="py-4 px-2 text-sm font-bold text-gray-900 text-right">{{ product.revenue | currency:'INR':'symbol':'1.0-0' }}</td>
-                </tr>
-                <tr *ngIf="data.topProducts.length === 0">
-                  <td colspan="2" class="py-8 text-center text-sm text-gray-400 font-medium">No sales recorded</td>
-                </tr>
-              </tbody>
-            </table>
           </div>
         </div>
 
+        <!-- Orders by Status -->
+        <ng-container *ngFor="let stat of data.ordersByStatus; let i = index">
+          <div class="kpi-card" *ngIf="i < 3">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm" style="color:var(--muted-foreground);text-transform:capitalize;">{{ stat.status }}</p>
+                <h2 class="mt-2" style="font-size:1.75rem;font-weight:700;">{{ stat.count }}</h2>
+              </div>
+              <div class="kpi-icon-box" [ngClass]="{
+                'bg-yellow-100': stat.status === 'pending',
+                'bg-blue-100': stat.status === 'processing',
+                'bg-purple-100': stat.status === 'shipped',
+                'bg-green-100': stat.status === 'delivered',
+                'bg-red-100': stat.status === 'cancelled'
+              }">
+                <mat-icon [ngClass]="{
+                  'text-yellow-600': stat.status === 'pending',
+                  'text-blue-600': stat.status === 'processing',
+                  'text-purple-600': stat.status === 'shipped',
+                  'text-green-600': stat.status === 'delivered',
+                  'text-red-600': stat.status === 'cancelled'
+                }" style="font-size:1.5rem;width:1.5rem;height:1.5rem;">
+                  {{ stat.status === 'pending' ? 'schedule' :
+                     stat.status === 'processing' ? 'sync' :
+                     stat.status === 'shipped' ? 'local_shipping' :
+                     stat.status === 'delivered' ? 'check_circle' : 'cancel' }}
+                </mat-icon>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Revenue Chart -->
+        <div class="ref-card lg:col-span-2">
+          <div class="ref-card-header">
+            <h3 class="ref-card-title flex items-center gap-2">
+              <mat-icon style="font-size:1.25rem;width:1.25rem;height:1.25rem;color:var(--primary);">bar_chart</mat-icon>
+              Revenue Over Time
+            </h3>
+          </div>
+          <div class="ref-card-content">
+            <div class="w-full" style="height:20rem;" *ngIf="data.revenueOverTime.length > 0; else noData">
+              <app-revenue-chart [data]="data.revenueOverTime"></app-revenue-chart>
+            </div>
+            <ng-template #noData>
+              <div class="flex flex-col items-center justify-center py-16" style="color:var(--muted-foreground);">
+                <mat-icon style="font-size:3rem;width:3rem;height:3rem;opacity:0.3;">show_chart</mat-icon>
+                <p class="mt-3 text-sm">No revenue data for this range.</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+
+        <!-- Top Products -->
+        <div class="ref-card">
+          <div class="ref-card-header">
+            <h3 class="ref-card-title flex items-center gap-2">
+              <mat-icon style="font-size:1.25rem;width:1.25rem;height:1.25rem;color:var(--primary);">star</mat-icon>
+              Top Products
+            </h3>
+          </div>
+          <div class="ref-card-content">
+            <div class="space-y-4">
+              <div *ngFor="let product of data.topProducts; let idx = index; trackBy: trackByName"
+                   class="flex items-center justify-between">
+                <div class="flex items-center gap-3 flex-1 min-w-0">
+                  <div class="w-8 h-8 rounded flex items-center justify-center text-sm font-medium" style="background-color:var(--muted);">
+                    #{{ idx + 1 }}
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="truncate text-sm">{{ product.name }}</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="text-sm font-semibold" style="color:var(--primary);">
+                    {{ product.revenue | currency:'INR':'symbol':'1.0-0' }}
+                  </p>
+                </div>
+              </div>
+              <div *ngIf="data.topProducts.length === 0" class="text-center py-8 text-sm" style="color:var(--muted-foreground);">
+                No sales recorded
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </ng-container>
 
+    <!-- Loading -->
     <ng-template #loading>
-      <div class="flex flex-col items-center justify-center py-20 text-gray-500" *ngIf="!errorMsg">
-        <svg class="animate-spin h-10 w-10 text-indigo-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        <span class="text-sm font-medium tracking-wide">Loading dashboard data...</span>
+      <div class="flex flex-col items-center justify-center py-20" *ngIf="!errorMsg">
+        <mat-spinner [diameter]="40"></mat-spinner>
+        <span class="text-sm mt-4" style="color:var(--muted-foreground);">Loading dashboard data...</span>
       </div>
     </ng-template>
   </div>

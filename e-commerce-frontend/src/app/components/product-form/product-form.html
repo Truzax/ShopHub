@@ -1,49 +1,84 @@
-<div class="product-form-container">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>{{ isEditMode ? 'Edit Product' : 'Add Product' }}</mat-card-title>
-    </mat-card-header>
-    
-    <mat-card-content>
-      <div *ngIf="errorMessage" class="error-message">
-        {{ errorMessage }}
+<div class="p-6 md:p-8 animate-fade-in">
+  <a routerLink="/products" class="inline-flex items-center gap-2 mb-6 text-sm hover:underline" style="color:var(--muted-foreground);">
+    <mat-icon style="font-size:1rem;width:1rem;height:1rem;">chevron_left</mat-icon>
+    Back to Products
+  </a>
+
+  <div class="mb-8">
+    <h1>{{ isEditMode ? 'Edit Product' : 'Add New Product' }}</h1>
+    <p class="mt-1" style="color:var(--muted-foreground);">
+      {{ isEditMode ? 'Update product information' : 'Fill in the product details below' }}
+    </p>
+  </div>
+
+  <div *ngIf="errorMessage" class="p-3 mb-6 rounded-lg text-sm" style="background-color:#fee2e2;color:#991b1b;">
+    {{ errorMessage }}
+  </div>
+
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Main Content -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Basic Information -->
+        <div class="ref-card">
+          <div class="ref-card-header">
+            <h3 class="ref-card-title">Basic Information</h3>
+          </div>
+          <div class="ref-card-content space-y-4">
+            <div>
+              <label class="ref-label" for="pf-name">Product Name</label>
+              <mat-form-field appearance="outline" class="w-full">
+                <input matInput id="pf-name" formControlName="name" placeholder="Enter product name" />
+                <mat-error *ngIf="productForm.get('name')?.hasError('required')">Name is required</mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="ref-label" for="pf-price">Price (₹)</label>
+                <mat-form-field appearance="outline" class="w-full">
+                  <input matInput id="pf-price" type="number" formControlName="price" placeholder="0.00" />
+                  <mat-error *ngIf="productForm.get('price')?.hasError('required')">Price is required</mat-error>
+                  <mat-error *ngIf="productForm.get('price')?.hasError('min')">Price must be positive</mat-error>
+                </mat-form-field>
+              </div>
+              <div>
+                <label class="ref-label" for="pf-stock">Stock Quantity</label>
+                <mat-form-field appearance="outline" class="w-full">
+                  <input matInput id="pf-stock" type="number" formControlName="stock" placeholder="0" />
+                  <mat-error *ngIf="productForm.get('stock')?.hasError('required')">Stock is required</mat-error>
+                  <mat-error *ngIf="productForm.get('stock')?.hasError('min')">Stock must be positive</mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div>
+              <label class="ref-label" for="pf-category">Category</label>
+              <mat-form-field appearance="outline" class="w-full">
+                <input matInput id="pf-category" formControlName="category" placeholder="Product category" />
+                <mat-error *ngIf="productForm.get('category')?.hasError('required')">Category is required</mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
-        
-        <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Name</mat-label>
-          <input matInput formControlName="name" placeholder="Product name">
-          <mat-error *ngIf="productForm.get('name')?.hasError('required')">Name is required</mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Price</mat-label>
-          <input matInput type="number" formControlName="price" placeholder="Product price">
-          <mat-error *ngIf="productForm.get('price')?.hasError('required')">Price is required</mat-error>
-          <mat-error *ngIf="productForm.get('price')?.hasError('min')">Price must be positive</mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Category</mat-label>
-          <input matInput formControlName="category" placeholder="Product category">
-          <mat-error *ngIf="productForm.get('category')?.hasError('required')">Category is required</mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Stock</mat-label>
-          <input matInput type="number" formControlName="stock" placeholder="Product stock">
-          <mat-error *ngIf="productForm.get('stock')?.hasError('required')">Stock is required</mat-error>
-          <mat-error *ngIf="productForm.get('stock')?.hasError('min')">Stock must be positive</mat-error>
-        </mat-form-field>
-
-        <div class="actions">
-          <button mat-raised-button color="primary" type="submit" [disabled]="productForm.invalid">
-            {{ isEditMode ? 'Update' : 'Create' }}
-          </button>
-          <a mat-button routerLink="/products">Cancel</a>
+      <!-- Sidebar -->
+      <div class="space-y-6">
+        <div class="ref-card">
+          <div class="ref-card-header">
+            <h3 class="ref-card-title">Publishing</h3>
+          </div>
+          <div class="ref-card-content space-y-3">
+            <button type="submit" [disabled]="productForm.invalid" class="ref-btn ref-btn-primary w-full ref-btn-lg">
+              {{ isEditMode ? 'Update Product' : 'Create Product' }}
+            </button>
+            <a routerLink="/products" class="ref-btn ref-btn-outline w-full text-center" style="text-decoration:none;">
+              Cancel
+            </a>
+          </div>
         </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+      </div>
+    </div>
+  </form>
 </div>
