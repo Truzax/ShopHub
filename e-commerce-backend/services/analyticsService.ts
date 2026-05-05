@@ -152,6 +152,7 @@ export class AnalyticsService {
           {
             $group: {
               _id: '$_id',
+              orderNumber: { $first: '$orderNumber' },
               user: { $first: '$user' },
               total: { $first: '$total' },
               status: { $first: '$status' },
@@ -171,7 +172,7 @@ export class AnalyticsService {
           { $unwind: '$userDetails' },
           {
             $project: {
-              id: '$_id',
+              id: { $ifNull: ['$orderNumber', { $toString: '$_id' }] },
               customer: '$userDetails.name',
               total: 1,
               status: 1,

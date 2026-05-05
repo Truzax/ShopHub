@@ -200,7 +200,7 @@
                 <div *ngFor="let order of data.recentOrders; trackBy: trackByOrderId"
                      class="flex items-center justify-between">
                   <div class="flex-1 min-w-0">
-                    <p class="font-mono text-sm">{{ order.id.substring(0, 8) }}...</p>
+                    <p class="font-mono text-sm">{{ order.orderNumber }}</p>
                     <p class="text-sm truncate" style="color:var(--muted-foreground);">{{ order.customer }}</p>
                   </div>
                   <div class="flex items-center gap-3">

@@ -15,7 +15,7 @@
           <ng-container matColumnDef="id">
             <th mat-header-cell *matHeaderCellDef>Order ID</th>
             <td mat-cell *matCellDef="let order">
-              <span class="font-mono text-sm">{{ order._id | slice:0:8 }}...</span>
+              <span class="font-mono text-sm">{{ order.orderNumber || order._id }}</span>
             </td>
           </ng-container>
 
