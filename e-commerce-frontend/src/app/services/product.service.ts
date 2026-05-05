@@ -35,4 +35,8 @@ export class ProductService {
   deleteProduct(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
+
+  getCategories(): Observable<{ success: boolean, data: string[] }> {
+    return this.http.get<{ success: boolean, data: string[] }>(`${this.baseUrl}/categories`);
+  }
 }

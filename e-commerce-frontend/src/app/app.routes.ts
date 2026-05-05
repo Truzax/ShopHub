@@ -12,6 +12,7 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
       { path: 'dashboard', component: DashboardComponent },
+      { path: 'analytics', loadComponent: () => import('./components/analytics/analytics.component').then(m => m.AnalyticsComponent), canActivate: [AdminGuard] },
       { path: 'products', loadComponent: () => import('./components/product-list/product-list').then(m => m.ProductList) },
       { path: 'products/new', loadComponent: () => import('./components/product-form/product-form').then(m => m.ProductForm), canActivate: [AdminGuard] },
       { path: 'products/edit/:id', loadComponent: () => import('./components/product-form/product-form').then(m => m.ProductForm), canActivate: [AdminGuard] },

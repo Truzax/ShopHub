@@ -29,6 +29,10 @@ import { map } from 'rxjs/operators';
           <mat-icon style="font-size:1.25rem;width:1.25rem;height:1.25rem;">dashboard</mat-icon>
           <span>Dashboard</span>
         </a>
+        <a routerLink="/analytics" routerLinkActive="active" class="admin-nav-item">
+          <mat-icon style="font-size:1.25rem;width:1.25rem;height:1.25rem;">trending_up</mat-icon>
+          <span>Analytics</span>
+        </a>
         <a routerLink="/products" routerLinkActive="active" class="admin-nav-item">
           <mat-icon style="font-size:1.25rem;width:1.25rem;height:1.25rem;">inventory_2</mat-icon>
           <span>Products</span>
@@ -66,7 +70,7 @@ import { map } from 'rxjs/operators';
                   {{ isAdmin ? 'dashboard' : 'shopping_cart' }}
                 </mat-icon>
               </div>
-              <span class="font-semibold" style="color:var(--foreground);">{{ isAdmin ? 'Admin Panel' : 'ShopHub' }}</span>
+              <span class="font-semibold" style="color:var(--foreground);">{{'ShopHub'}}</span>
             </button>
           </div>
 
