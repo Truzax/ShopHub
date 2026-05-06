@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
-import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -17,18 +16,17 @@ import { AuthService } from '../../services/auth';
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, MatTableModule, MatPaginatorModule, MatButtonModule, MatIconModule, MatSnackBarModule, MatInputModule],
+  imports: [CommonModule, RouterModule, FormsModule, MatTableModule, MatButtonModule, MatIconModule, MatSnackBarModule, MatInputModule],
   templateUrl: './product-list.html',
   styleUrls: ['./product-list.css']
 })
 export class ProductList implements OnInit {
-  products: Product[] = [];
+  allProducts: Product[] = [];
+  filteredProducts: Product[] = [];
   displayedColumns: string[] = ['name', 'price', 'category', 'stock', 'quantity', 'cartActions'];
-  totalItems = 0;
-  pageSize = 10;
-  currentPage = 1;
   isAdmin = false;
   quantities: { [key: string]: number } = {};
+  searchTerm: string = '';
   private destroyRef = inject(DestroyRef);
 
   constructor(
@@ -49,24 +47,38 @@ export class ProductList implements OnInit {
   }
 
   loadProducts() {
-    this.productService.getProducts(this.currentPage, this.pageSize).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(res => {
-      this.products = res.data ? [...res.data] : [];
-      this.totalItems = res.total || 0;
-      // Initialize quantities for each product
-      this.products.forEach(product => {
+    this.productService.getProducts(1, 1000).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(res => {
+      this.allProducts = res.data ? [...res.data] : [];
+      this.applySearchFilter();
+
+      this.allProducts.forEach(product => {
         const productId = (product as any)._id;
         if (!this.quantities[productId]) {
           this.quantities[productId] = 1;
         }
       });
+
       this.cdr.detectChanges();
     });
   }
 
-  onPageChange(event: PageEvent) {
-    this.currentPage = event.pageIndex + 1;
-    this.pageSize = event.pageSize;
-    this.loadProducts();
+  onSearchChange(searchValue: string) {
+    this.searchTerm = searchValue;
+    this.applySearchFilter();
+  }
+
+  private applySearchFilter() {
+    const normalizedSearchTerm = this.searchTerm.trim().toLowerCase();
+
+    if (!normalizedSearchTerm) {
+      this.filteredProducts = [...this.allProducts];
+      return;
+    }
+
+    this.filteredProducts = this.allProducts.filter(product =>
+      product.name.toLowerCase().includes(normalizedSearchTerm) ||
+      product.category.toLowerCase().includes(normalizedSearchTerm)
+    );
   }
 
   addToCart(product: Product) {

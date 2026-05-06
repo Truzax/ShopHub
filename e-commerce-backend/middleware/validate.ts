@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 export const validateProduct = (req: Request, res: Response, next: NextFunction) => {
     const { name, price, category, stock } = req.body;
     
-    if (!name || typeof name !== 'string') return res.status(400).json({ message: 'Valid name is required' });
+    if (!name || typeof name !== 'string' || name.trim().length === 0) return res.status(400).json({ message: 'Valid name is required' });
     if (price === undefined || typeof price !== 'number' || price < 0) return res.status(400).json({ message: 'Valid price is required' });
     if (!category || typeof category !== 'string') return res.status(400).json({ message: 'Valid category is required' });
     if (stock === undefined || typeof stock !== 'number' || stock < 0) return res.status(400).json({ message: 'Valid stock is required' });

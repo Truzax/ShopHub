@@ -4,18 +4,29 @@
     <div class="flex items-center justify-between mb-8">
       <div>
         <h1>Inventory Management</h1>
-        <p class="mt-1" style="color:var(--muted-foreground);">Manage your product catalog</p>
+        <p class="mt-1 text-[var(--muted-foreground)]">Manage your product catalog</p>
       </div>
       <a routerLink="/products/new" class="ref-btn ref-btn-primary">
-        <mat-icon style="font-size:1rem;width:1rem;height:1rem;">add</mat-icon>
+        <mat-icon class="text-base w-4 h-4">add</mat-icon>
         Add Product
       </a>
     </div>
-
+    <div class="mb-8">
+      <div class="relative inline-block max-w-[500px] gap-2 w-full">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange(searchTerm)"
+          placeholder="Search products by name or category..."
+          class="ref-input"
+        />
+        <mat-icon class="absolute right-[12px] top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]">search</mat-icon>
+      </div>
+    </div>
     <div class="ref-card">
       <div class="ref-card-content">
         <div class="ref-table-container">
-          <table mat-table [dataSource]="products" class="ref-table w-full">
+          <table mat-table [dataSource]="filteredProducts" class="ref-table w-full">
             <ng-container matColumnDef="name">
               <th mat-header-cell *matHeaderCellDef>Product</th>
               <td mat-cell *matCellDef="let product">
@@ -41,25 +52,25 @@
               <th mat-header-cell *matHeaderCellDef>Stock</th>
               <td mat-cell *matCellDef="let product">
                 <div class="flex items-center gap-2">
-                  <mat-icon *ngIf="product.stock < 20" style="font-size:1rem;width:1rem;height:1rem;color:#d97706;">warning</mat-icon>
-                  <span [style.color]="product.stock < 20 ? '#d97706' : 'inherit'">{{ product.stock }}</span>
+                  <mat-icon *ngIf="product.stock < 20" class="text-base w-4 h-4 text-[#d97706]">warning</mat-icon>
+                  <span [class.text-[#d97706]]="product.stock < 20">{{ product.stock }}</span>
                 </div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef class="text-right">Actions</th>
+              <th mat-header-cell *matHeaderCellDef class="text-center">Actions</th>
               <td mat-cell *matCellDef="let product" class="text-right">
                 <div class="flex items-center justify-end gap-1">
-                  <a [routerLink]="['/products/edit', product._id]" class="ref-btn ref-btn-ghost ref-btn-icon" style="width:2rem;height:2rem;">
-                    <mat-icon style="font-size:1.125rem;width:1.125rem;height:1.125rem;">edit</mat-icon>
+                  <a [routerLink]="['/products/edit', product._id]" class="ref-btn ref-btn-ghost ref-btn-icon w-8 h-8">
+                    <mat-icon class="text-[1.125rem] w-[1.125rem] h-[1.125rem]">edit</mat-icon>
                   </a>
-                  <button class="ref-btn ref-btn-ghost ref-btn-icon" style="width:2rem;height:2rem;color:var(--destructive);" (click)="deleteProduct(product._id)">
-                    <mat-icon style="font-size:1.125rem;width:1.125rem;height:1.125rem;">delete</mat-icon>
+                  <button class="ref-btn ref-btn-ghost ref-btn-icon w-8 h-8 text-[var(--destructive)]" (click)="deleteProduct(product._id)">
+                    <mat-icon class="text-[1.125rem] w-[1.125rem] h-[1.125rem]">delete</mat-icon>
                   </button>
                 </div>
               </td>
-            </ng-container>
+            </ng-container>  
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
@@ -71,64 +82,65 @@
 
   <!-- Customer View: Product Grid -->
   <ng-container *ngIf="!isAdmin">
-    <div class="mb-8">
+    <div class="mb-4">
       <h1>Discover Products</h1>
-      <p class="mt-2" style="color:var(--muted-foreground);">Showing {{ products.length }} products</p>
+      <p class="text-[var(--muted-foreground)]">Showing {{ filteredProducts.length }} products</p>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="mb-4">
+      <div class="relative inline-block max-w-[500px] gap-2 w-full">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange(searchTerm)"
+          placeholder="Search products by name or category..."
+          class="ref-input"
+        />
+        <mat-icon class="absolute right-[12px] top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]">search</mat-icon>
+      </div>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      <div *ngFor="let product of products" class="ref-card overflow-hidden group cursor-pointer" style="transition:box-shadow 0.2s ease;">
-        <div class="aspect-square overflow-hidden" style="background-color:var(--muted);border-radius:var(--radius) var(--radius) 0 0;">
-          <div class="w-full h-full flex items-center justify-center" style="background:linear-gradient(135deg, var(--accent), var(--muted));">
-            <mat-icon style="font-size:3rem;width:3rem;height:3rem;color:var(--muted-foreground);opacity:0.5;">inventory_2</mat-icon>
+      <div *ngFor="let product of filteredProducts" class="ref-card overflow-hidden group cursor-pointer transition-shadow duration-200 ease">
+        <div class="aspect-square overflow-hidden bg-[var(--muted)] rounded-t-[var(--radius)]">
+          <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[var(--accent)] to-[var(--muted)]">
+            <mat-icon class="text-[3rem] w-[3rem] h-[3rem] text-[var(--muted-foreground)] opacity-50">inventory_2</mat-icon>
           </div>
         </div>
         <div class="p-4 space-y-3">
-          <div>
-            <span class="ref-badge ref-badge-secondary mb-2 inline-block">{{ product.category }}</span>
-            <h3 class="line-clamp-2" style="font-size:1rem;">{{ product.name }}</h3>
+            <div class="flex justify-between">
+            <div class="flex flex-col justify-between items-start">
+              <h3 class="line-clamp-2 text-base">{{ product.name }}</h3>
+              <span class="ref-badge ref-badge-secondary mb-2 inline-block">{{ product.category }}</span>
+            </div>
+            <div class="flex flex-col items-start">
+              <span class="font-semibold text-[var(--primary)] text-xl">{{ product.price | currency:'INR':'symbol':'1.0-2' }}</span>
+              <span *ngIf="product.stock <= 0" class="ref-badge ref-badge-secondary mb-2 inline-block text-[#d97706]">Out of stock</span>
+              <span *ngIf="product.stock > 0 && product.stock <= 5" class="ref-badge ref-badge-secondary mb-2 inline-block text-[#d97706]">Only {{ product.stock }} left</span>
+            </div>
           </div>
-          <div class="flex items-center justify-between">
-            <span class="font-semibold" style="color:var(--primary);">{{ product.price | currency:'INR':'symbol':'1.0-2' }}</span>
-            <span class="text-sm" style="color:var(--muted-foreground);">Stock: {{ product.stock }}</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <input
-              type="number"
-              min="1"
-              [max]="product.stock"
-              [(ngModel)]="quantities[getProductId(product)]"
-              class="ref-input"
-              style="width:4rem;text-align:center;padding:0.375rem 0.5rem;"
-            />
-            <button
-              class="ref-btn ref-btn-primary ref-btn-sm flex-1"
-              (click)="addToCart(product)"
-              [disabled]="product.stock <= 0"
-            >
-              <mat-icon style="font-size:1rem;width:1rem;height:1rem;">shopping_cart</mat-icon>
-              Add to Cart
-            </button>
-          </div>
+          <button
+            class="ref-btn ref-btn-primary ref-btn-sm w-full"
+            (click)="addToCart(product)"
+            [disabled]="product.stock <= 0"
+            [ngClass]="{'opacity-50 cursor-not-allowed': product.stock <= 0}"
+            [attr.aria-disabled]="product.stock <= 0"
+          >
+            <mat-icon class="text-base w-full h-4">shopping_cart</mat-icon>
+            Add to Cart
+          </button>
         </div>
       </div>
     </div>
 
-    <div *ngIf="products.length === 0" class="text-center py-16">
-      <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style="background-color:var(--muted);">
-        <mat-icon style="font-size:2rem;width:2rem;height:2rem;color:var(--muted-foreground);">search_off</mat-icon>
+    <div *ngIf="filteredProducts.length === 0" class="text-center py-16">
+      <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-[var(--muted)]">
+        <mat-icon class="text-[2rem] w-[2rem] h-[2rem] text-[var(--muted-foreground)]">search_off</mat-icon>
       </div>
       <h3>No products found</h3>
-      <p class="mt-2" style="color:var(--muted-foreground);">Try adjusting your filters</p>
+      <p class="mt-2 text-[var(--muted-foreground)]">Try adjusting your search</p>
     </div>
   </ng-container>
 
-  <mat-paginator
-    [length]="totalItems"
-    [pageSize]="pageSize"
-    [pageSizeOptions]="[5, 10, 25, 100]"
-    [pageIndex]="currentPage - 1"
-    (page)="onPageChange($event)"
-    aria-label="Select page">
-  </mat-paginator>
 </div>

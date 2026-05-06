@@ -55,13 +55,13 @@ import { map } from 'rxjs/operators';
     <div *ngIf="isAdmin && sidebarOpen()" class="fixed inset-0 bg-black/50 z-30 lg:hidden" (click)="sidebarOpen.set(false)"></div>
 
     <!-- Main wrapper -->
-    <div [class.admin-main]="isAdmin">
+    <div [class.admin-main]="isAdmin" [class.sidebar-collapsed]="isAdmin && !sidebarOpen()">
       <!-- Header -->
       <header class="sticky top-0 z-50 border-b shadow-sm" style="background-color:var(--card);border-color:var(--border);">
         <div class="flex items-center justify-between h-16 px-4" [class.max-w-7xl]="!isAdmin" [class.mx-auto]="!isAdmin">
           <!-- Left: Logo / Menu -->
           <div class="flex items-center gap-3">
-            <button *ngIf="isAdmin" class="lg:hidden ref-btn ref-btn-ghost ref-btn-icon" (click)="sidebarOpen.set(!sidebarOpen())">
+            <button *ngIf="isAdmin" class="ref-btn ref-btn-ghost ref-btn-icon" (click)="sidebarOpen.set(!sidebarOpen())" aria-label="Toggle admin sidebar">
               <mat-icon>menu</mat-icon>
             </button>
             <button type="button" (click)="redirectHome()" class="flex items-center gap-2 cursor-pointer bg-transparent border-0 p-0">
@@ -139,6 +139,10 @@ export class LayoutComponent {
       this.user = u;
       this.isAdmin = u?.role === 'admin';
     });
+
+    if (typeof window !== 'undefined') {
+      this.sidebarOpen.set(window.matchMedia('(min-width: 1025px)').matches);
+    }
 
     // Initialize dark mode from localStorage
     const savedTheme = localStorage.getItem('theme');
