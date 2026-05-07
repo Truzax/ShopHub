@@ -2,6 +2,10 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { CartItem, Cart } from '../models/cart.model';
 import { Product } from '../models/product.model';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { AuthService } from './auth';
+import { environment } from '../../environments/environment';
+import { tap, filter, take, switchMap, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -9,9 +13,96 @@ import { Product } from '../models/product.model';
 export class CartService {
   private cartSubject = new BehaviorSubject<Cart>({ items: [], total: 0 });
   public cart$ = this.cartSubject.asObservable();
+  private apiUrl = `${environment.apiUrl}/cart`;
+  private isSyncing = false;
 
-  constructor() {
+  constructor(private http: HttpClient, private authService: AuthService) {
     this.loadCartFromStorage();
+    this.initCartSync();
+  }
+
+  private initCartSync(): void {
+    // When user changes (login/logout)
+    this.authService.currentUser$.subscribe((user) => {
+      if (user) {
+        // User just logged in, sync guest cart to server
+        this.mergeAndSyncWithServer();
+      } else {
+        // User logged out, clear the local cart
+        this.cartSubject.next({ items: [], total: 0 });
+        localStorage.removeItem('cart');
+      }
+    });
+  }
+
+  private getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('access_token');
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  private mergeAndSyncWithServer(): void {
+    const localCart = this.cartSubject.value;
+    
+    this.http.get<any>(this.apiUrl, { headers: this.getHeaders() }).subscribe(
+      (response) => {
+        const serverCartItems = response.data?.items || [];
+        
+        if (localCart.items.length > 0) {
+          // Merge local into server
+          const mergedItems = [...serverCartItems];
+          
+          localCart.items.forEach(localItem => {
+            const existingItem = mergedItems.find(si => si.product._id === localItem.product._id);
+            if (existingItem) {
+              existingItem.quantity += localItem.quantity;
+            } else {
+              mergedItems.push({
+                product: localItem.product,
+                quantity: localItem.quantity
+              });
+            }
+          });
+          
+          // Save merged to server
+          this.saveCartToServer(mergedItems);
+        } else if (serverCartItems.length > 0) {
+          // Just load server cart
+          this.cartSubject.next({
+            items: serverCartItems,
+            total: this.calculateTotal(serverCartItems)
+          });
+          this.saveCartToLocalStorage();
+        }
+      },
+      (error) => console.error('Error fetching cart from server:', error)
+    );
+  }
+
+  private saveCartToServer(items: any[]): void {
+    const payload = {
+      items: items.map(i => ({
+        product: i.product._id,
+        quantity: i.quantity
+      }))
+    };
+
+    this.http.post<any>(this.apiUrl, payload, { headers: this.getHeaders() }).subscribe(
+      (response) => {
+        const updatedItems = response.data?.items || [];
+        this.cartSubject.next({
+          items: updatedItems,
+          total: this.calculateTotal(updatedItems)
+        });
+        this.saveCartToLocalStorage();
+      },
+      (error) => console.error('Error saving cart to server:', error)
+    );
+  }
+
+  private calculateTotal(items: CartItem[]): number {
+    return items.reduce((sum, item) => sum + (item.product.price || 0) * item.quantity, 0);
   }
 
   private loadCartFromStorage(): void {
@@ -26,8 +117,18 @@ export class CartService {
     }
   }
 
-  private saveCartToStorage(): void {
+  private saveCartToLocalStorage(): void {
     localStorage.setItem('cart', JSON.stringify(this.cartSubject.value));
+  }
+
+  private saveAndSync(): void {
+    this.saveCartToLocalStorage();
+    
+    // Also sync to server if logged in
+    if (this.authService.isAuthenticated()) {
+      const items = this.cartSubject.value.items;
+      this.saveCartToServer(items);
+    }
   }
 
   private getProductId(product: Product): string {
@@ -60,7 +161,7 @@ export class CartService {
     }
 
     this.updateCartTotal();
-    this.saveCartToStorage();
+    this.saveAndSync();
 
     return {
       success: quantityToAdd === quantity,
@@ -77,7 +178,7 @@ export class CartService {
       (item) => this.getProductId(item.product) !== productId
     );
     this.updateCartTotal();
-    this.saveCartToStorage();
+    this.saveAndSync();
   }
 
   updateQuantity(productId: string, quantity: number): { success: boolean; addedQuantity: number; message?: string } {
@@ -96,7 +197,7 @@ export class CartService {
       const nextQuantity = Math.min(quantity, maxQuantity);
       item.quantity = nextQuantity;
       this.updateCartTotal();
-      this.saveCartToStorage();
+      this.saveAndSync();
 
       return {
         success: nextQuantity === quantity,
@@ -121,6 +222,13 @@ export class CartService {
   clearCart(): void {
     this.cartSubject.next({ items: [], total: 0 });
     localStorage.removeItem('cart');
+    
+    if (this.authService.isAuthenticated()) {
+      this.http.delete(this.apiUrl, { headers: this.getHeaders() }).subscribe(
+        () => {},
+        (error) => console.error('Error clearing cart on server:', error)
+      );
+    }
   }
 
   private updateCartTotal(): void {

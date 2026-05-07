@@ -1,13 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { AnalyticsService, DashboardResponse } from '../services/analyticsService';
 
-/**
- * Get analytics dashboard data
- * Query parameters:
- *   - startDate (required): ISO date string
- *   - endDate (required): ISO date string
- *   - category (optional): Product category filter
- */
 export const getDashboardData = async (
   req: Request,
   res: Response,
