@@ -182,7 +182,7 @@ export class AnalyticsService {
           },
         ],
         categoryDistribution: [
-          { $group: { _id: '$productDetails.category', value: { $sum: 1 } } },
+          { $group: { _id: '$productDetails.category', value: { $sum: '$products.quantity' } } },
           { $project: { name: '$_id', value: 1, _id: 0 } },
         ],
         activeCustomers: [
