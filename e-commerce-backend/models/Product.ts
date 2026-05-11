@@ -5,6 +5,12 @@ export interface IProduct extends Document {
     price: number;
     category: string;
     stock: number;
+    description?: {
+        short?: string;
+        long?: string;
+    };
+    features?: string[];
+    seoKeywords?: string[];
 }
 
 const ProductSchema = new Schema<IProduct>(
@@ -13,6 +19,12 @@ const ProductSchema = new Schema<IProduct>(
         price: { type: Number, required: true, min: 0 },
         category: { type: String, required: true, trim: true },
         stock: { type: Number, required: true, min: 0 },
+        description: {
+            short: { type: String },
+            long: { type: String }
+        },
+        features: [{ type: String }],
+        seoKeywords: [{ type: String }],
     },
     { timestamps: true }
 );

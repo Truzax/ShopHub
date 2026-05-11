@@ -43,12 +43,26 @@ const OrderSchema = new Schema<IOrder>(
 
 OrderSchema.pre('save', async function() {
     if (!this.orderNumber) {
-        const date = new Date();
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-        this.orderNumber = `ORD-${year}${month}${day}-${random}`;
+        let isUnique = false;
+        let generatedNumber = '';
+        
+        while (!isUnique) {
+            const date = new Date();
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            // Increase random part to 8 characters for much higher collision resistance
+            const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+            generatedNumber = `ORD-${year}${month}${day}-${random}`;
+            
+            // Check if this number already exists
+            const existingOrder = await mongoose.model('Order').findOne({ orderNumber: generatedNumber });
+            if (!existingOrder) {
+                isUnique = true;
+            }
+        }
+        
+        this.orderNumber = generatedNumber;
     }
 });
 

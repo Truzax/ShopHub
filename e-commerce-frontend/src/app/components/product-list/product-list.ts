@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, DestroyRef, inject } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef, DestroyRef, inject, Input } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -20,13 +20,17 @@ import { AuthService } from '../../services/auth';
   templateUrl: './product-list.html',
   styleUrls: ['./product-list.css']
 })
-export class ProductList implements OnInit {
+export class ProductList implements OnInit, OnChanges {
+  @Input() showHeader = true;
+  @Input() categoryFilter = '';
+  @Input() sortOption = '';
   allProducts: Product[] = [];
   filteredProducts: Product[] = [];
   displayedColumns: string[] = ['name', 'price', 'category', 'stock', 'quantity', 'cartActions'];
   isAdmin = false;
   quantities: { [key: string]: number } = {};
   searchTerm: string = '';
+  cartProductIds: Set<string> = new Set();
   private destroyRef = inject(DestroyRef);
 
   constructor(
@@ -43,7 +47,24 @@ export class ProductList implements OnInit {
     if (this.isAdmin) {
       this.displayedColumns = ['name', 'price', 'category', 'stock', 'actions'];
     }
+    
+    // Track items in cart for UI state
+    this.cartService.cart$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(cart => {
+      this.cartProductIds = new Set(cart.items.map(item => (item.product as any)._id));
+      this.cdr.detectChanges();
+    });
+
     this.loadProducts();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['categoryFilter'] || changes['sortOption']) {
+      this.applySearchFilter();
+    }
+  }
+
+  isProductInCart(product: Product): boolean {
+    return !!product._id && this.cartProductIds.has(product._id);
   }
 
   loadProducts() {
@@ -69,16 +90,26 @@ export class ProductList implements OnInit {
 
   private applySearchFilter() {
     const normalizedSearchTerm = this.searchTerm.trim().toLowerCase();
+    const normalizedCategory = this.categoryFilter.trim().toLowerCase();
 
-    if (!normalizedSearchTerm) {
-      this.filteredProducts = [...this.allProducts];
-      return;
+    let result = this.allProducts.filter(product => {
+      const matchesSearch = !normalizedSearchTerm || 
+        product.name.toLowerCase().includes(normalizedSearchTerm) ||
+        product.category.toLowerCase().includes(normalizedSearchTerm);
+      
+      const matchesCategory = !normalizedCategory || 
+        product.category.toLowerCase() === normalizedCategory;
+
+      return matchesSearch && matchesCategory;
+    });
+
+    if (this.sortOption === 'price_asc') {
+      result.sort((a, b) => a.price - b.price);
+    } else if (this.sortOption === 'price_desc') {
+      result.sort((a, b) => b.price - a.price);
     }
 
-    this.filteredProducts = this.allProducts.filter(product =>
-      product.name.toLowerCase().includes(normalizedSearchTerm) ||
-      product.category.toLowerCase().includes(normalizedSearchTerm)
-    );
+    this.filteredProducts = result;
   }
 
   addToCart(product: Product) {

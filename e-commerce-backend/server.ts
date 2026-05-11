@@ -20,6 +20,7 @@ import productsRoute from './routes/products';
 import ordersRoute from './routes/orders';
 import analyticsRoute from './routes/analytics';
 import cartRoute from './routes/cart';
+import aiRoute from './routes/ai';
 import errorHandler from './utils/errorHandler';
 
 const app = express();
@@ -42,6 +43,7 @@ app.use('/api/products', productsRoute);
 app.use('/api/orders', ordersRoute);
 app.use('/api/dashboard', analyticsRoute);
 app.use('/api/cart', cartRoute);
+app.use('/api/ai', aiRoute);
 
 // Error handler
 app.use(errorHandler);

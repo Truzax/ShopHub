@@ -21,8 +21,16 @@
       <div class="lg:col-span-2 space-y-6">
         <!-- Basic Information -->
         <div class="ref-card">
-          <div class="ref-card-header">
+          <div class="ref-card-header flex justify-between items-center">
             <h3 class="ref-card-title">Basic Information</h3>
+            <button type="button" class="ref-btn text-indigo-600 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 flex items-center px-3 py-1 text-sm rounded-md transition-colors" (click)="generateAiDescription()" [disabled]="isGeneratingAi">
+              <mat-spinner *ngIf="isGeneratingAi" diameter="16" class="mr-2"></mat-spinner>
+              <mat-icon *ngIf="!isGeneratingAi" class="mr-1" style="font-size: 16px; width: 16px; height: 16px;">auto_awesome</mat-icon>
+              {{ isGeneratingAi ? 'Generating...' : 'Generate AI Content' }}
+            </button>
+          </div>
+          <div *ngIf="aiError" class="mx-6 p-3 rounded-lg text-sm bg-red-50 text-red-700 border border-red-200">
+            {{ aiError }}
           </div>
           <div class="ref-card-content space-y-4">
             <div>
@@ -59,6 +67,44 @@
                 <mat-error *ngIf="productForm.get('category')?.hasError('required')">Category is required</mat-error>
               </mat-form-field>
             </div>
+            
+            <!-- AI Generated Content Fields -->
+            <div class="border-t border-slate-100 pt-4 mt-2">
+              <h4 class="text-sm font-semibold text-slate-700 mb-3 flex items-center">
+                <mat-icon class="mr-1 text-indigo-500" style="font-size: 18px; width: 18px; height: 18px;">description</mat-icon>
+                Detailed Information
+              </h4>
+              
+              <div>
+                <label class="ref-label" for="pf-short-desc">Short Description</label>
+                <mat-form-field appearance="outline" class="w-full">
+                  <textarea matInput id="pf-short-desc" formControlName="shortDescription" placeholder="A catchy summary" rows="2"></textarea>
+                </mat-form-field>
+              </div>
+
+              <div>
+                <label class="ref-label" for="pf-long-desc">Long Description</label>
+                <mat-form-field appearance="outline" class="w-full">
+                  <textarea matInput id="pf-long-desc" formControlName="longDescription" placeholder="Detailed marketing copy" rows="4"></textarea>
+                </mat-form-field>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="ref-label" for="pf-features">Features (One per line)</label>
+                  <mat-form-field appearance="outline" class="w-full">
+                    <textarea matInput id="pf-features" formControlName="features" placeholder="e.g. Lightweight design&#10;Water resistant" rows="3"></textarea>
+                  </mat-form-field>
+                </div>
+                <div>
+                  <label class="ref-label" for="pf-seo">SEO Keywords (Comma separated)</label>
+                  <mat-form-field appearance="outline" class="w-full">
+                    <textarea matInput id="pf-seo" formControlName="seoKeywords" placeholder="e.g. best laptop, gaming laptop, affordable" rows="3"></textarea>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+            
           </div>
         </div>
       </div>

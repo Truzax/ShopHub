@@ -37,7 +37,7 @@ import { map } from 'rxjs/operators';
           <mat-icon style="font-size:1.25rem;width:1.25rem;height:1.25rem;">inventory_2</mat-icon>
           <span>Products</span>
         </a>
-        <a routerLink="/orders" routerLinkActive="active" class="admin-nav-item">
+        <a routerLink="/admin/orders" routerLinkActive="active" class="admin-nav-item">
           <mat-icon style="font-size:1.25rem;width:1.25rem;height:1.25rem;">shopping_bag</mat-icon>
           <span>Orders</span>
         </a>
@@ -101,6 +101,20 @@ import { map } from 'rxjs/operators';
                 <div class="text-xs mt-1" style="color:var(--muted-foreground);text-transform:uppercase;">{{ user?.role || '' }}</div>
               </div>
               <mat-divider></mat-divider>
+              
+              <!-- Customer Only Links -->
+              <ng-container *ngIf="!isAdmin">
+                <button mat-menu-item routerLink="/orders">
+                  <mat-icon>local_shipping</mat-icon>
+                  <span>My Orders</span>
+                </button>
+                <button mat-menu-item routerLink="/profile">
+                  <mat-icon>person</mat-icon>
+                  <span>My Profile</span>
+                </button>
+                <mat-divider></mat-divider>
+              </ng-container>
+
               <button mat-menu-item (click)="logout()">
                 <mat-icon>logout</mat-icon>
                 <span>Sign out</span>

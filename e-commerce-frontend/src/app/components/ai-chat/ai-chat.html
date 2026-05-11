@@ -1,0 +1,86 @@
+<ng-container *ngIf="isAuthenticated">
+<!-- Chat Widget Button -->
+<button 
+  class="fixed bottom-6 right-6 w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg shadow-indigo-600/30 flex items-center justify-center transition-transform hover:scale-105 z-50 focus:outline-none"
+  (click)="toggleChat()"
+  [class.rotate-12]="!isOpen">
+  <mat-icon *ngIf="!isOpen">smart_toy</mat-icon>
+  <mat-icon *ngIf="isOpen">close</mat-icon>
+</button>
+
+<!-- Chat Window -->
+<div 
+  class="fixed bottom-24 right-6 w-[350px] sm:w-[400px] h-[550px] max-h-[80vh] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden transition-all duration-300 origin-bottom-right z-50"
+  [class.scale-0]="!isOpen"
+  [class.opacity-0]="!isOpen"
+  [class.scale-100]="isOpen"
+  [class.opacity-100]="isOpen">
+  
+  <!-- Header -->
+  <div class="bg-indigo-600 p-4 text-white flex items-center shadow-md z-10">
+    <div class="bg-white/20 p-2 rounded-full mr-3 backdrop-blur-sm">
+      <mat-icon class="text-white block">auto_awesome</mat-icon>
+    </div>
+    <div>
+      <h3 class="font-bold m-0 leading-tight" style="color: white !important;">AI Assistant</h3>
+      <p class="text-xs m-0" style="color: rgba(255, 255, 255, 0.8) !important;">Always here to help</p>
+    </div>
+  </div>
+
+  <!-- Messages Area -->
+  <div #chatContainer class="flex-1 overflow-y-auto p-4 bg-slate-50 flex flex-col gap-4">
+    <div *ngFor="let msg of messages" 
+         class="max-w-[85%] rounded-2xl px-4 py-3 shadow-sm text-sm"
+         [ngClass]="msg.role === 'user' ? 'bg-indigo-600 text-white self-end rounded-tr-sm' : 'bg-white border border-slate-200 text-slate-800 self-start rounded-tl-sm'">
+      
+      <!-- User message -->
+      <ng-container *ngIf="msg.role === 'user'">
+        {{ msg.content }}
+      </ng-container>
+
+      <!-- AI message (Markdown parsed) -->
+      <ng-container *ngIf="msg.role === 'model'">
+        <div class="prose prose-sm prose-indigo max-w-none" [innerHTML]="msg.content" *ngIf="msg.isHtml"></div>
+        <span *ngIf="!msg.isHtml">{{ msg.content }}</span>
+      </ng-container>
+    </div>
+
+    <!-- Loading indicator -->
+    <div *ngIf="isLoading" class="bg-white border border-slate-200 text-slate-500 self-start rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex items-center">
+      <div class="flex gap-1">
+        <span class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+        <span class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+        <span class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Suggestions -->
+  <div class="px-4 py-2 bg-slate-50 overflow-x-auto flex gap-2 no-scrollbar border-t border-slate-100" *ngIf="messages.length < 3 && !isLoading">
+    <button *ngFor="let suggestion of suggestions" class="whitespace-nowrap text-xs bg-white border border-slate-200 text-slate-600 px-3 py-1.5 rounded-full hover:bg-slate-100 hover:border-slate-300 transition-colors" (click)="useSuggestion(suggestion)">
+      {{ suggestion }}
+    </button>
+  </div>
+
+  <!-- Input Area -->
+  <div class="p-3 bg-white border-t border-slate-200">
+    <form (ngSubmit)="sendMessage()" class="flex items-center gap-2 bg-slate-100 rounded-full p-1 border border-transparent focus-within:border-indigo-300 focus-within:bg-white transition-colors">
+      <input 
+        type="text" 
+        [(ngModel)]="newMessage" 
+        name="message"
+        placeholder="Type your message..." 
+        class="flex-1 bg-transparent border-none px-4 py-2 text-sm focus:outline-none focus:ring-0 text-slate-800"
+        [disabled]="isLoading"
+        autocomplete="off"
+      >
+      <button 
+        type="submit" 
+        [disabled]="!newMessage.trim() || isLoading"
+        class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center disabled:opacity-50 disabled:bg-slate-400 transition-colors hover:bg-indigo-700">
+        <mat-icon style="font-size: 18px; width: 18px; height: 18px;">arrow_upward</mat-icon>
+      </button>
+    </form>
+  </div>
+</div>
+</ng-container>

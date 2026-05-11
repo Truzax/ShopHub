@@ -16,6 +16,7 @@ import { DashboardService } from '../../services/dashboard.service';
 import { ProductService } from '../../services/product.service';
 import { DashboardData, DashboardFilter, RevenuePoint, CategoryDistribution } from '../../models/dashboard.model';
 import { map } from 'rxjs/operators';
+import { ProductList } from '../product-list/product-list';
 
 @Component({
   selector: 'app-dashboard-chart',
@@ -114,7 +115,7 @@ export class DashboardChartComponent implements OnChanges, OnDestroy {
 @Component({
   selector: 'app-dashboard-component',
   standalone: true,
-  imports: [CommonModule, FormsModule, DashboardChartComponent, HttpClientModule, MatCardModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule, RouterModule, AsyncPipe, NgIf],
+  imports: [CommonModule, FormsModule, DashboardChartComponent, HttpClientModule, MatCardModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule, RouterModule, AsyncPipe, NgIf, ProductList],
   templateUrl: './dashboard-component.html',
   styleUrls: ['./dashboard-component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -135,6 +136,8 @@ export class DashboardComponent implements OnInit {
   public dashboardData$!: Observable<DashboardData | null>;
   public categories$!: Observable<string[]>;
   public errorMsg = '';
+  public selectedCategory = '';
+  public selectedSort = '';
 
   lineChartOptions = {
     interaction: { mode: 'index', intersect: false },
@@ -203,6 +206,10 @@ export class DashboardComponent implements OnInit {
 
   applyFilters(): void {
     this.filterSubject.next({ ...this.filters });
+  }
+
+  setCategory(cat: string): void {
+    this.selectedCategory = this.selectedCategory === cat ? '' : cat;
   }
 
   getTotalRevenue(data: DashboardData): number {

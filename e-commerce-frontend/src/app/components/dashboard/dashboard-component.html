@@ -1,17 +1,58 @@
 <div *ngIf="currentUser$ | async as user" class="animate-fade-in">
-  <!-- Welcome Card (Customer View) -->
-  <div *ngIf="user.role !== 'admin'" class="p-6">
-    <div class="ref-card">
-      <div class="ref-card-content">
-        <h2 class="mb-2">Welcome back, {{ user.name || user.email }}!</h2>
-        <p class="mb-4" style="color:var(--muted-foreground);">This is your dashboard. Browse products or check your orders.</p>
-        <div class="flex gap-3 flex-wrap">
-          <a routerLink="/products" class="ref-btn ref-btn-primary">View Products</a>
-          <a routerLink="/cart" class="ref-btn ref-btn-outline">View Cart</a>
-          <a routerLink="/orders" class="ref-btn ref-btn-outline">My Orders</a>
+  <!-- Customer View: Storefront Experience -->
+  <div *ngIf="user.role !== 'admin'" class="flex flex-col gap-8 pb-12">
+    
+    <!-- Hero Banner: Practical & Actionable -->
+    <div class="relative overflow-hidden rounded-2xl bg-slate-900 text-white p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="max-w-xl relative z-10">
+        <h1 class="text-2xl md:text-3xl font-bold mb-2" style="color: #ffffff !important;">Welcome to ShopHub</h1>
+        <p class="text-slate-200 text-sm md:text-base leading-relaxed" style="color: rgba(255, 255, 255, 0.9) !important;">
+          Discover our curated selection of premium products. Fast shipping, easy returns, and exclusive deals.
+        </p>
+      </div>
+      <!-- <div class="flex-shrink-0">
+        <button (click)="selectedCategory = ''" class="ref-btn bg-white text-slate-900 hover:bg-slate-50 border-none px-6 py-2.5 font-semibold shadow-sm">
+          Shop All Products
+        </button>
+      </div> -->
+      <!-- Subtle Background Icon -->
+      <mat-icon class="absolute right-0 top-1/2 -translate-y-1/2 text-white/5 scale-[5] pointer-events-none select-none">local_mall</mat-icon>
+    </div>
+
+    <!-- Main Product Grid (Embedded ProductList) -->
+    <section class="flex-1 flex flex-col">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-100">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">
+            {{ selectedCategory ? selectedCategory + ' Products' : 'All Products' }}
+          </h2>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <!-- Category Dropdown -->
+          <div class="relative">
+            <select [(ngModel)]="selectedCategory" class="ref-input appearance-none pr-8 bg-white" style="min-width: 160px;">
+              <option value="">All Categories</option>
+              <option *ngFor="let cat of categories$ | async" [value]="cat">{{ cat }}</option>
+            </select>
+          </div>
+
+          <!-- Sort Dropdown -->
+          <div class="relative">
+            <select [(ngModel)]="selectedSort" class="ref-input appearance-none pr-8 bg-white" style="min-width: 160px;">
+              <option value="">Sort By: Default</option>
+              <option value="price_asc">Price: Low to High</option>
+              <option value="price_desc">Price: High to Low</option>
+            </select>
+          </div>
         </div>
       </div>
-    </div>
+      
+      <!-- Reusing the existing ProductList component -->
+      <div class="flex-1">
+        <app-product-list [showHeader]="false" [categoryFilter]="selectedCategory" [sortOption]="selectedSort"></app-product-list>
+      </div>
+    </section>
   </div>
 
   <!-- Analytics Dashboard (Admin Only) -->

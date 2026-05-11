@@ -9,6 +9,7 @@ export interface OrderItem {
 
 export interface Order {
   _id?: string;
+  orderNumber: string;
   user: any; // User interface
   products: OrderItem[];
   total: number;

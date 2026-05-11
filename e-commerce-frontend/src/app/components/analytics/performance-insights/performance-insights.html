@@ -1,0 +1,58 @@
+<div class="mb-6">
+  <div class="flex items-center mb-6">
+    <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 mr-3">
+      <mat-icon>psychology</mat-icon>
+    </div>
+    <div>
+      <h2 class="text-xl font-bold text-slate-800 m-0 leading-tight">Performance Insights</h2>
+      <p class="text-sm text-slate-500 m-0">AI-driven actionable recommendations</p>
+    </div>
+  </div>
+
+  <!-- Loading Skeletons -->
+  <div *ngIf="loading" class="space-y-4">
+    <div *ngFor="let i of [1,2,3]" class="bg-white p-4 rounded-xl border border-slate-200 flex items-start">
+      <div class="h-10 w-10 bg-slate-200 rounded-full animate-pulse mr-4"></div>
+      <div class="flex-1">
+        <div class="h-5 w-1/4 bg-slate-200 rounded animate-pulse mb-2"></div>
+        <div class="h-4 w-3/4 bg-slate-200 rounded animate-pulse"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl flex items-center">
+    <mat-icon class="mr-3">error_outline</mat-icon>
+    <p class="m-0">{{ error }}</p>
+  </div>
+
+  <!-- AI Insights Content -->
+  <div *ngIf="!loading && !error && insights.length > 0" class="space-y-4 animate-fade-in">
+    <div *ngFor="let insight of insights" 
+         class="p-4 rounded-xl border flex items-start transition-shadow hover:shadow-sm"
+         [ngClass]="getColorClassForType(insight.type)">
+      
+      <div class="p-2 rounded-full mr-4 flex items-center justify-center bg-white/50" [ngClass]="getIconColorClassForType(insight.type)">
+        <mat-icon>{{ getIconForType(insight.type) }}</mat-icon>
+      </div>
+      
+      <div class="flex-1">
+        <div class="flex items-center justify-between mb-1">
+          <h3 class="font-bold text-base leading-tight m-0 text-slate-800">{{ insight.title }}</h3>
+          <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md opacity-80" [ngClass]="getIconColorClassForType(insight.type) + ' bg-white/60'">
+            {{ insight.type }}
+          </span>
+        </div>
+        <p class="text-sm text-slate-700 leading-relaxed m-0">{{ insight.description }}</p>
+      </div>
+    </div>
+  </div>
+  
+  <div *ngIf="!loading && !error && insights.length === 0" class="bg-white p-8 rounded-xl border border-slate-200 text-center">
+    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4 text-slate-400">
+      <mat-icon class="text-3xl">check_circle</mat-icon>
+    </div>
+    <h3 class="text-lg font-medium text-slate-800 mb-1">Looking Good</h3>
+    <p class="text-slate-500 m-0">No urgent insights or recommendations at this time.</p>
+  </div>
+</div>

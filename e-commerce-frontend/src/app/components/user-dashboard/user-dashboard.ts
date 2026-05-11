@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -20,6 +20,7 @@ import { OrderService } from '../../services/order.service';
 export class UserDashboard implements OnInit {
   private auth = inject(AuthService);
   private orderService = inject(OrderService);
+  private route = inject(ActivatedRoute);
 
   activeTab = signal<'orders' | 'profile' | 'settings'>('orders');
   user: any = null;
@@ -39,6 +40,13 @@ export class UserDashboard implements OnInit {
     this.userData.email = this.user?.email || '';
     this.userData.phone = this.user?.phone || '';
     this.userData.address = this.user?.address || '';
+
+    // Handle tab selection via query params
+    this.route.queryParams.subscribe(params => {
+      if (params['tab']) {
+        this.activeTab.set(params['tab'] as any);
+      }
+    });
 
     this.orderService.getOrders(1, 50).subscribe(res => {
       this.orders = res.data || [];

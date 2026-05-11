@@ -8,6 +8,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DashboardChartComponent } from '../dashboard/dashboard-component';
 import { DashboardService } from '../../services/dashboard.service';
 import { ProductService } from '../../services/product.service';
+import { SalesSummaryComponent } from './sales-summary/sales-summary';
+import { PerformanceInsightsComponent } from './performance-insights/performance-insights';
 import { DashboardData, DashboardFilter } from '../../models/dashboard.model';
 import { of, Subject, timer, combineLatest, Observable } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, startWith, switchMap, map } from 'rxjs/operators';
@@ -22,10 +24,10 @@ import { catchError, debounceTime, distinctUntilChanged, startWith, switchMap, m
     MatButtonModule, 
     MatIconModule, 
     MatProgressSpinnerModule, 
-    DashboardChartComponent,
+    SalesSummaryComponent,
+    PerformanceInsightsComponent,
     AsyncPipe,
-    NgIf,
-    CurrencyPipe
+    NgIf
   ],
   templateUrl: './analytics.component.html',
   styleUrls: ['./analytics.component.css']
