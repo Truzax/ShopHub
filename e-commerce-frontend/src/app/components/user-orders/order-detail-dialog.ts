@@ -11,7 +11,7 @@ import { Order } from '../../models/order.model';
   standalone: true,
   imports: [CommonModule, MatDialogModule, MatIconModule, MatButtonModule, MatDividerModule],
   template: `
-    <div class="p-0 overflow-hidden rounded-3xl animate-fade-in" style="min-width: 450px; max-width: 600px;">
+    <div class="p-0 overflow-hidden rounded-3xl animate-fade-in min-w-[450px] max-w-[600px]">
       <!-- Header -->
       <div class="bg-indigo-600 p-8 text-white relative">
         <button mat-icon-button (click)="dialogRef.close()" class="absolute top-4 right-4 text-white/80 hover:text-white hover:bg-white/10">

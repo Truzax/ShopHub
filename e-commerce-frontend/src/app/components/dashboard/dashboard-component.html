@@ -3,10 +3,10 @@
   <div *ngIf="user.role !== 'admin'" class="flex flex-col gap-8 pb-12">
     
     <!-- Hero Banner: Practical & Actionable -->
-    <div class="relative overflow-hidden rounded-2xl bg-slate-900 text-white p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+    <div class="relative overflow-hidden rounded-2xl bg-[var(--card)] p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 text-[var(--primary)]">
       <div class="max-w-xl relative z-10">
-        <h1 class="text-2xl md:text-3xl font-bold mb-2" style="color: #ffffff !important;">Welcome to ShopHub</h1>
-        <p class="text-slate-200 text-sm md:text-base leading-relaxed" style="color: rgba(255, 255, 255, 0.9) !important;">
+        <h1 class="text-2xl md:text-3xl font-bold mb-2">Welcome to ShopHub</h1>
+        <p class="text-sm md:text-base leading-relaxed">
           Discover our curated selection of premium products. Fast shipping, easy returns, and exclusive deals.
         </p>
       </div>
@@ -16,12 +16,12 @@
         </button>
       </div> -->
       <!-- Subtle Background Icon -->
-      <mat-icon class="absolute right-0 top-1/2 -translate-y-1/2 text-white/5 scale-[5] pointer-events-none select-none">local_mall</mat-icon>
+      <mat-icon class="absolute right-0 top-1/2 -translate-y-1/2 scale-[5] pointer-events-none select-none">local_mall</mat-icon>
     </div>
 
     <!-- Main Product Grid (Embedded ProductList) -->
     <section class="flex-1 flex flex-col">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-100">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
         <div>
           <h2 class="text-xl font-bold text-slate-900">
             {{ selectedCategory ? selectedCategory + ' Products' : 'All Products' }}
@@ -31,7 +31,7 @@
         <div class="flex items-center gap-3">
           <!-- Category Dropdown -->
           <div class="relative">
-            <select [(ngModel)]="selectedCategory" class="ref-input appearance-none pr-8 bg-white" style="min-width: 160px;">
+            <select [(ngModel)]="selectedCategory" class="ref-input appearance-none pr-8 bg-white min-w-[160px]">
               <option value="">All Categories</option>
               <option *ngFor="let cat of categories$ | async" [value]="cat">{{ cat }}</option>
             </select>
@@ -39,7 +39,7 @@
 
           <!-- Sort Dropdown -->
           <div class="relative">
-            <select [(ngModel)]="selectedSort" class="ref-input appearance-none pr-8 bg-white" style="min-width: 160px;">
+            <select [(ngModel)]="selectedSort" class="ref-input appearance-none pr-8 bg-white min-w-[160px]">
               <option value="">Sort By: Default</option>
               <option value="price_asc">Price: Low to High</option>
               <option value="price_desc">Price: High to Low</option>
@@ -62,27 +62,24 @@
       <div class="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1>Dashboard</h1>
-          <p class="mt-1" style="color:var(--muted-foreground);">Welcome back! Here's what's happening today.</p>
+          <p class="mt-1 text-[var(--muted-foreground)]">Welcome back! Here's what's happening today.</p>
         </div>
-        <div class="flex flex-wrap gap-3 items-center">
+        <div class="flex gap-3 items-center">
           <input
             type="date"
-            class="ref-input"
-            style="width:auto;"
+            class="ref-input w-auto"
             [(ngModel)]="filters.startDate"
             (ngModelChange)="applyFilters()"
           />
-          <span style="color:var(--muted-foreground);">to</span>
+          <span class="text-[var(--muted-foreground)]">to</span>
           <input
             type="date"
-            class="ref-input"
-            style="width:auto;"
+            class="ref-input w-auto"
             [(ngModel)]="filters.endDate"
             (ngModelChange)="applyFilters()"
           />
           <select
-            class="ref-input"
-            style="width:auto;"
+            class="ref-input w-auto"
             [(ngModel)]="filters.category"
             (ngModelChange)="applyFilters()">
             <option value="">All Categories</option>
@@ -92,8 +89,8 @@
       </div>
 
       <!-- Error -->
-      <div *ngIf="errorMsg" class="p-4 rounded-lg flex items-center gap-2" style="background-color:#fee2e2;color:#991b1b;">
-        <mat-icon style="font-size:1.25rem;width:1.25rem;height:1.25rem;">error</mat-icon>
+      <div *ngIf="errorMsg" class="p-4 rounded-lg flex items-center gap-2 bg-[var(--destructive)] text-[var(--destructive-foreground)]">
+        <mat-icon class="text-[var(--destructive-foreground)] text-[1.25rem] w-[1.25rem] h-[1.25rem]">error</mat-icon>
         {{ errorMsg }}
       </div>
 
@@ -104,15 +101,15 @@
             <div class="ref-card-content pt-6">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm" style="color:var(--muted-foreground);">Total Revenue</p>
+                  <p class="text-sm text-[var(--muted-foreground)]">Total Revenue</p>
                   <h2 class="mt-2">{{ getTotalRevenue(data) | currency:'INR':'symbol':'1.0-0' }}</h2>
                   <div class="flex items-center gap-1 mt-2 text-sm" [ngClass]="data.trends.revenue >= 0 ? 'text-green-600' : 'text-red-600'">
-                    <mat-icon style="font-size:1rem;width:1rem;height:1rem;">{{ data.trends.revenue >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
+                    <mat-icon class="text-[1rem] w-[1rem] h-[1rem]">{{ data.trends.revenue >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
                     <span>{{ data.trends.revenue > 0 ? '+' : '' }}{{ data.trends.revenue }}%</span>
                   </div>
                 </div>
-                <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background-color:color-mix(in srgb, var(--primary) 10%, transparent);">
-                  <mat-icon style="color:var(--primary);">payments</mat-icon>
+                <div class="w-12 h-12 rounded-lg flex items-center justify-center bg-[color-mix(in_srgb,var(--primary)_10%,transparent)]">
+                  <mat-icon class="text-[var(--primary)]">payments</mat-icon>
                 </div>
               </div>
             </div>
@@ -122,15 +119,15 @@
             <div class="ref-card-content pt-6">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm" style="color:var(--muted-foreground);">Total Orders</p>
+                  <p class="text-sm text-[var(--muted-foreground)]">Total Orders</p>
                   <h2 class="mt-2">{{ data.totalOrders }}</h2>
                   <div class="flex items-center gap-1 mt-2 text-sm" [ngClass]="data.trends.orders >= 0 ? 'text-green-600' : 'text-red-600'">
-                    <mat-icon style="font-size:1rem;width:1rem;height:1rem;">{{ data.trends.orders >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
+                    <mat-icon class="text-[1rem] w-[1rem] h-[1rem]" >{{ data.trends.orders >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
                     <span>{{ data.trends.orders > 0 ? '+' : '' }}{{ data.trends.orders }}%</span>
                   </div>
                 </div>
-                <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background-color:color-mix(in srgb, var(--secondary) 10%, transparent);">
-                  <mat-icon style="color:var(--secondary);">shopping_bag</mat-icon>
+                <div class="w-12 h-12 rounded-lg flex items-center justify-center bg-[color-mix(in_srgb,var(--secondary)_10%,transparent)]">
+                  <mat-icon class="text-[var(--secondary)]">shopping_bag</mat-icon>
                 </div>
               </div>
             </div>
@@ -140,10 +137,10 @@
             <div class="ref-card-content pt-6">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm" style="color:var(--muted-foreground);">Active Customers</p>
+                  <p class="text-sm text-[var(--muted-foreground)]">Active Customers</p>
                   <h2 class="mt-2">{{ data.activeCustomers || 0 }}</h2>
                   <div class="flex items-center gap-1 mt-2 text-sm" [ngClass]="data.trends.customers >= 0 ? 'text-green-600' : 'text-red-600'">
-                    <mat-icon style="font-size:1rem;width:1rem;height:1rem;">{{ data.trends.customers >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
+                    <mat-icon class="text-[1rem] w-[1rem] h-[1rem]">{{ data.trends.customers >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
                     <span>{{ data.trends.customers > 0 ? '+' : '' }}{{ data.trends.customers }}%</span>
                   </div>
                 </div>
@@ -158,10 +155,10 @@
             <div class="ref-card-content pt-6">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-sm" style="color:var(--muted-foreground);">Avg. Order Value</p>
+                  <p class="text-sm text-[var(--muted-foreground)]">Avg. Order Value</p>
                   <h2 class="mt-2">{{ data.avgOrderValue | currency:'INR':'symbol':'1.0-0' }}</h2>
                   <div class="flex items-center gap-1 mt-2 text-sm" [ngClass]="data.trends.avgOrderValue >= 0 ? 'text-green-600' : 'text-red-600'">
-                    <mat-icon style="font-size:1rem;width:1rem;height:1rem;">{{ data.trends.avgOrderValue >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
+                    <mat-icon class="text-[1rem] w-[1rem] h-[1rem]"> {{ data.trends.avgOrderValue >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
                     <span>{{ data.trends.avgOrderValue > 0 ? '+' : '' }}{{ data.trends.avgOrderValue }}%</span>
                   </div>
                 </div>
@@ -180,7 +177,7 @@
               <h3 class="ref-card-title">Revenue & Orders</h3>
             </div>
             <div class="ref-card-content">
-              <div class="w-full" style="height:20rem;">
+              <div class="w-full h-[22rem]">
                 <app-dashboard-chart [type]="'line'" [data]="data.revenueOverTime" [options]="lineChartOptions"></app-dashboard-chart>
               </div>
             </div>
@@ -191,7 +188,7 @@
               <h3 class="ref-card-title">Sales by Category</h3>
             </div>
             <div class="ref-card-content">
-              <div class="w-full" style="height:20rem;">
+              <div class="w-full h-[22rem]">
                 <app-dashboard-chart [type]="'pie'" [data]="data.categoryDistribution" [options]="pieChartOptions"></app-dashboard-chart>
               </div>
             </div>
@@ -210,12 +207,12 @@
                 <div *ngFor="let product of data.topProducts; let idx = index; trackBy: trackByName"
                      class="flex items-center justify-between">
                   <div class="flex items-center gap-4 flex-1 min-w-0">
-                    <div class="w-8 h-8 rounded flex items-center justify-center text-sm font-medium" style="background-color:var(--muted);">
+                    <div class="w-8 h-8 rounded flex items-center justify-center text-sm font-medium bg-[var(--muted)]">
                       #{{ idx + 1 }}
                     </div>
                     <div class="flex-1 min-w-0">
                       <p class="truncate">{{ product.name }}</p>
-                      <p class="text-sm" style="color:var(--muted-foreground);">Top seller</p>
+                      <p class="text-sm text-[var(--muted-foreground)]">Top seller</p>
                     </div>
                   </div>
                   <div class="text-right">
@@ -224,7 +221,7 @@
                     </p>
                   </div>
                 </div>
-                <div *ngIf="data.topProducts.length === 0" class="text-center py-8 text-sm" style="color:var(--muted-foreground);">
+                <div *ngIf="data.topProducts.length === 0" class="text-center py-8 text-sm text-[var(--muted-foreground)]">
                   No sales recorded
                 </div>
               </div>
@@ -242,7 +239,7 @@
                      class="flex items-center justify-between">
                   <div class="flex-1 min-w-0">
                     <p class="font-mono text-sm">{{ order.id }}</p>
-                    <p class="text-sm truncate" style="color:var(--muted-foreground);">{{ order.customer }}</p>
+                    <p class="text-sm truncate text-[var(--muted-foreground)]">{{ order.customer }}</p>
                   </div>
                   <div class="flex items-center gap-3">
                     <span class="ref-badge" [ngClass]="getStatusClass(order.status)">
@@ -251,7 +248,7 @@
                     <p class="font-semibold text-primary w-24 text-right">{{ order.total | currency:'INR':'symbol':'1.0-0' }}</p>
                   </div>
                 </div>
-                <div *ngIf="data.recentOrders.length === 0" class="text-center py-8 text-sm" style="color:var(--muted-foreground);">
+                <div *ngIf="data.recentOrders.length === 0" class="text-center py-8 text-sm text-[var(--muted-foreground)]">
                   No orders found
                 </div>
               </div>
@@ -264,7 +261,7 @@
       <ng-template #loading>
         <div class="flex flex-col items-center justify-center py-20" *ngIf="!errorMsg">
           <mat-spinner [diameter]="40"></mat-spinner>
-          <span class="text-sm mt-4" style="color:var(--muted-foreground);">Loading dashboard data...</span>
+          <span class="text-sm mt-4 text-[var(--muted-foreground)]">Loading dashboard data...</span>
         </div>
       </ng-template>
     </div>

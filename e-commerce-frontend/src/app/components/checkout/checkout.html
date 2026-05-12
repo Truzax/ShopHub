@@ -12,10 +12,10 @@
           <!-- Billing Info -->
           <div>
             <h3 class="mb-2">Customer Details</h3>
-            <div class="p-4 rounded-lg space-y-1" style="background-color:var(--muted);">
-              <p *ngIf="currentUser" style="color:var(--foreground);">{{ currentUser.fullName || currentUser.name }}</p>
-              <p class="text-sm" style="color:var(--muted-foreground);">{{ currentUser?.email }}</p>
-              <p class="text-sm" style="color:var(--muted-foreground);">{{ currentUser?.phone || '' }}</p>
+            <div class="p-4 rounded-lg space-y-1 bg-[var(--muted)]">
+              <p *ngIf="currentUser" class="text-[var(--foreground)]">{{ currentUser.fullName || currentUser.name }}</p>
+              <p class="text-sm text-[var(--muted-foreground)]">{{ currentUser?.email }}</p>
+              <p class="text-sm text-[var(--muted-foreground)]">{{ currentUser?.phone || '' }}</p>
             </div>
           </div>
 
@@ -23,17 +23,17 @@
           <div>
             <h3 class="mb-2">Order Items</h3>
             <div class="space-y-2">
-              <div *ngFor="let item of cart.items" class="flex justify-between p-4 rounded-lg" style="background-color:var(--muted);">
+              <div *ngFor="let item of cart.items" class="flex justify-between p-4 rounded-lg bg-[var(--muted)]">
                 <div class="flex gap-4">
-                  <div class="w-16 h-16 rounded overflow-hidden flex items-center justify-center" style="background-color:var(--card);">
-                    <mat-icon style="color:var(--muted-foreground);">inventory_2</mat-icon>
+                  <div class="w-16 h-16 rounded overflow-hidden flex items-center justify-center bg-[var(--card)]">
+                    <mat-icon class="text-[var(--muted-foreground)]">inventory_2</mat-icon>
                   </div>
                   <div>
-                    <p style="color:var(--foreground);">{{ item.product.name }}</p>
-                    <p class="text-sm" style="color:var(--muted-foreground);">Qty: {{ item.quantity }}</p>
+                    <p class="text-[var(--foreground)]">{{ item.product.name }}</p>
+                    <p class="text-sm text-[var(--muted-foreground)]">Qty: {{ item.quantity }}</p>
                   </div>
                 </div>
-                <p style="color:var(--foreground);font-weight:500;">{{ (item.product.price * item.quantity) | currency:'INR':'symbol':'1.0-2' }}</p>
+                <p class="font-semibold text-[var(--foreground)]">{{ (item.product.price * item.quantity) | currency:'INR':'symbol':'1.0-2' }}</p>
               </div>
             </div>
           </div>
@@ -41,17 +41,15 @@
           <!-- Loading -->
           <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-8 gap-3">
             <mat-spinner [diameter]="40"></mat-spinner>
-            <p class="text-sm" style="color:var(--muted-foreground);">Processing your order...</p>
+            <p class="text-sm text-[var(--muted-foreground)]">Processing your order...</p>
           </div>
 
           <!-- Confirmation Note -->
-          <div *ngIf="!isLoading" class="p-4 rounded-lg" style="background-color:var(--accent);">
-            <div class="flex items-start gap-3">
-              <mat-icon style="color:var(--primary);font-size:1.25rem;width:1.25rem;height:1.25rem;margin-top:2px;">info</mat-icon>
-              <p class="text-sm" style="color:var(--accent-foreground);">
-                By clicking "Place Order", you agree to place this order for the amount shown.
-              </p>
-            </div>
+          <div *ngIf="!isLoading" class="p-4 rounded-lg bg-[var(--accent)]  flex items-start gap-3">
+            <mat-icon class="text-[var(--primary)] w-[1.25rem] h-[1.25rem] mt-[2px] text-[1.25rem]">info</mat-icon>
+            <p class="text-sm text-[var(--accent-foreground)]">
+              By clicking "Place Order", you agree to place this order for the amount shown.
+            </p>
           </div>
 
           <!-- Actions -->
@@ -71,22 +69,22 @@
     <div class="lg:col-span-1">
       <div class="ref-card sticky top-24">
         <div class="ref-card-content space-y-4">
-          <h3 style="font-weight:600;">Order Summary</h3>
+          <h3 class="font-semibold">Order Summary</h3>
           <hr class="ref-separator">
           <div class="space-y-2">
             <div class="flex justify-between">
-              <span style="color:var(--muted-foreground);">Subtotal</span>
+              <span class="text-[var(--muted-foreground)]">Subtotal</span>
               <span>{{ cart.total | currency:'INR':'symbol':'1.0-2' }}</span>
             </div>
             <div class="flex justify-between">
-              <span style="color:var(--muted-foreground);">Shipping</span>
+              <span class="text-[var(--muted-foreground)]">Shipping</span>
               <span>FREE</span>
             </div>
           </div>
           <hr class="ref-separator">
           <div class="flex justify-between font-semibold text-lg">
             <span>Total</span>
-            <span style="color:var(--primary);">{{ cart.total | currency:'INR':'symbol':'1.0-2' }}</span>
+            <span class="text-[var(--primary)]">{{ cart.total | currency:'INR':'symbol':'1.0-2' }}</span>
           </div>
         </div>
       </div>

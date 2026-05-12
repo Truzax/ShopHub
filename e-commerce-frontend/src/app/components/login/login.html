@@ -7,7 +7,7 @@
 
     <div class="auth-card-content">
       @if (error) {
-        <div class="p-3 mb-4 rounded-lg text-sm" style="background-color:#fee2e2;color:#991b1b;">{{ error }}</div>
+        <div class="p-3 mb-4 rounded-lg text-sm bg-red-100 text-red-800">{{ error }}</div>
       }
 
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate class="space-y-4">
@@ -23,8 +23,8 @@
 
         <div>
           <div class="flex items-center justify-between mb-1">
-            <label class="ref-label" for="login-password" style="margin-bottom:0;">Password</label>
-            <a class="text-sm cursor-pointer hover:underline" style="color:var(--primary);" (click)="router.navigate(['/forgot-password'])">Forgot password?</a>
+            <label class="ref-label mb-0" for="login-password">Password</label>
+            <a class="text-sm cursor-pointer hover:underline text-[var(--primary)]" (click)="router.navigate(['/forgot-password'])">Forgot password?</a>
           </div>
           <mat-form-field appearance="outline" class="w-full">
             <input matInput id="login-password" [type]="hide() ? 'password' : 'text'" formControlName="password" placeholder="••••••••" (blur)="updateErrorMessages()" />
@@ -37,7 +37,7 @@
           </mat-form-field>
         </div>
 
-        <button mat-raised-button type="submit" [disabled]="loginForm.invalid" class="w-full ref-btn ref-btn-primary ref-btn-lg" style="border-radius:calc(var(--radius) - 2px);">
+        <button mat-raised-button type="submit" [disabled]="loginForm.invalid" class="w-full ref-btn ref-btn-primary ref-btn-lg rounded-[calc(var(--radius)-2px)]">
           Sign In
         </button>
       </form>
@@ -60,9 +60,9 @@
       </div>-->
 
       <!-- Sign up link -->
-      <div class="text-center text-sm mt-4" style="color:var(--foreground);">
+      <div class="text-center text-sm mt-4 text-[var(--foreground)]">
         Don't have an account?
-        <a class="cursor-pointer hover:underline font-medium" style="color:var(--primary);" (click)="router.navigate(['/signup'])">Sign up</a>
+        <a class="cursor-pointer hover:underline font-medium text-[var(--primary)]" (click)="router.navigate(['/signup'])">Sign up</a>
       </div>
     </div>
   </div>

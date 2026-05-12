@@ -19,33 +19,33 @@ import { map } from 'rxjs/operators';
     <aside *ngIf="isAdmin" class="admin-sidebar" [class.open]="sidebarOpen()">
       <div class="admin-sidebar-header">
         <div class="admin-sidebar-logo">
-          <mat-icon class="text-white" style="font-size:1.25rem;width:1.25rem;height:1.25rem;">dashboard</mat-icon>
+          <mat-icon class="text-white text-xl w-5 h-5">dashboard</mat-icon>
         </div>
-        <span style="font-weight:600;color:var(--sidebar-foreground);">Admin Panel</span>
+        <span class="font-semibold text-[var(--sidebar-foreground)]">Admin Panel</span>
       </div>
 
       <nav>
         <a routerLink="/dashboard" routerLinkActive="active" class="admin-nav-item" [routerLinkActiveOptions]="{exact: true}">
-          <mat-icon style="font-size:1.25rem;width:1.25rem;height:1.25rem;">dashboard</mat-icon>
+          <mat-icon class="text-xl w-5 h-5">dashboard</mat-icon>
           <span>Dashboard</span>
         </a>
         <a routerLink="/analytics" routerLinkActive="active" class="admin-nav-item">
-          <mat-icon style="font-size:1.25rem;width:1.25rem;height:1.25rem;">trending_up</mat-icon>
+          <mat-icon class="text-xl w-5 h-5">trending_up</mat-icon>
           <span>Analytics</span>
         </a>
         <a routerLink="/products" routerLinkActive="active" class="admin-nav-item">
-          <mat-icon style="font-size:1.25rem;width:1.25rem;height:1.25rem;">inventory_2</mat-icon>
+          <mat-icon class="text-xl w-5 h-5">inventory_2</mat-icon>
           <span>Products</span>
         </a>
         <a routerLink="/admin/orders" routerLinkActive="active" class="admin-nav-item">
-          <mat-icon style="font-size:1.25rem;width:1.25rem;height:1.25rem;">shopping_bag</mat-icon>
+          <mat-icon class="text-xl w-5 h-5">shopping_bag</mat-icon>
           <span>Orders</span>
         </a>
       </nav>
 
       <div class="admin-sidebar-footer">
         <button class="admin-nav-item" (click)="logout()">
-          <mat-icon style="font-size:1.25rem;width:1.25rem;height:1.25rem;">logout</mat-icon>
+          <mat-icon class="text-xl w-5 h-5">logout</mat-icon>
           <span>Sign out</span>
         </button>
       </div>
@@ -57,7 +57,7 @@ import { map } from 'rxjs/operators';
     <!-- Main wrapper -->
     <div [class.admin-main]="isAdmin" [class.sidebar-collapsed]="isAdmin && !sidebarOpen()">
       <!-- Header -->
-      <header class="sticky top-0 z-50 border-b shadow-sm" style="background-color:var(--card);border-color:var(--border);">
+      <header class="sticky top-0 z-50 border-b shadow-sm bg-[var(--card)] border-[var(--border)]">
         <div class="flex items-center justify-between h-16 px-4" [class.max-w-7xl]="!isAdmin" [class.mx-auto]="!isAdmin">
           <!-- Left: Logo / Menu -->
           <div class="flex items-center gap-3">
@@ -65,12 +65,12 @@ import { map } from 'rxjs/operators';
               <mat-icon>menu</mat-icon>
             </button>
             <button type="button" (click)="redirectHome()" class="flex items-center gap-2 cursor-pointer bg-transparent border-0 p-0">
-              <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background-color:var(--primary);">
-                <mat-icon class="text-white" style="font-size:1.25rem;width:1.25rem;height:1.25rem;">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--primary)]">
+                <mat-icon class="text-white text-xl w-5 h-5">
                   {{ isAdmin ? 'dashboard' : 'shopping_cart' }}
                 </mat-icon>
               </div>
-              <span class="font-semibold" style="color:var(--foreground);">{{'ShopHub'}}</span>
+              <span class="font-semibold text-[var(--foreground)]">{{'ShopHub'}}</span>
             </button>
           </div>
 
@@ -78,7 +78,7 @@ import { map } from 'rxjs/operators';
           <div class="flex items-center gap-2">
             <!-- Dark mode toggle -->
             <button class="theme-toggle" (click)="toggleTheme()" [attr.aria-label]="darkMode() ? 'Switch to light mode' : 'Switch to dark mode'">
-              <mat-icon style="font-size:1.25rem;width:1.25rem;height:1.25rem;">
+              <mat-icon class="text-xl w-5 h-5">
                 {{ darkMode() ? 'light_mode' : 'dark_mode' }}
               </mat-icon>
             </button>
@@ -86,19 +86,19 @@ import { map } from 'rxjs/operators';
             <!-- Cart (customer only) -->
             <button *ngIf="!isAdmin" class="theme-toggle" routerLink="/cart">
               <mat-icon [matBadge]="(cartItemCount$ | async)" matBadgeColor="warn" matBadgeSize="small"
-                style="font-size:1.25rem;width:1.25rem;height:1.25rem;">
+                class="text-xl w-5 h-5">
                 shopping_cart
               </mat-icon>
             </button>
 
             <!-- User menu -->
             <button class="theme-toggle" [matMenuTriggerFor]="menu">
-              <mat-icon style="font-size:1.25rem;width:1.25rem;height:1.25rem;">person</mat-icon>
+              <mat-icon class="text-xl w-5 h-5">person</mat-icon>
             </button>
             <mat-menu #menu="matMenu">
-              <div class="px-4 py-3" style="color:var(--foreground);">
+              <div class="px-4 py-3 text-[var(--foreground)]">
                 <div class="font-semibold">{{ user?.name || user?.email || 'User' }}</div>
-                <div class="text-xs mt-1" style="color:var(--muted-foreground);text-transform:uppercase;">{{ user?.role || '' }}</div>
+                <div class="text-xs mt-1 text-[var(--muted-foreground)] uppercase">{{ user?.role || '' }}</div>
               </div>
               <mat-divider></mat-divider>
               

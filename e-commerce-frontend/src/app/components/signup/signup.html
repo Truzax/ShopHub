@@ -7,7 +7,7 @@
 
     <div class="auth-card-content">
       @if (error) {
-        <div class="p-3 mb-4 rounded-lg text-sm" style="background-color:#fee2e2;color:#991b1b;">{{ error }}</div>
+        <div class="p-3 mb-4 rounded-lg text-sm bg-red-100 text-red-800">{{ error }}</div>
       }
 
       <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" novalidate class="space-y-4">
@@ -44,14 +44,14 @@
           </mat-form-field>
         </div>
 
-        <button mat-raised-button type="submit" [disabled]="signupForm.invalid" class="w-full ref-btn ref-btn-primary ref-btn-lg" style="border-radius:calc(var(--radius) - 2px);">
+        <button mat-raised-button type="submit" [disabled]="signupForm.invalid" class="w-full ref-btn ref-btn-primary ref-btn-lg rounded-[calc(var(--radius)-2px)]">
           Create Account
         </button>
       </form>
 
-      <div class="text-center text-sm mt-4" style="color:var(--foreground);">
+      <div class="text-center text-sm mt-4 text-[var(--foreground)]">
         Already have an account?
-        <a routerLink="/login" class="cursor-pointer hover:underline font-medium" style="color:var(--primary);">Sign in</a>
+        <a routerLink="/login" class="cursor-pointer hover:underline font-medium text-[var(--primary)]">Sign in</a>
       </div>
     </div>
   </div>

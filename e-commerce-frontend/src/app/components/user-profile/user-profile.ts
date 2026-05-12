@@ -28,10 +28,10 @@ import { environment } from '../../../environments/environment';
           <div class="bg-white rounded-3xl border border-slate-200 p-6 text-center shadow-sm sticky top-24">
             <div class="relative inline-block mb-4">
               <div class="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mx-auto border-4 border-white shadow-md">
-                <mat-icon style="font-size: 40px; width: 40px; height: 40px;">person</mat-icon>
+                <mat-icon class="text-[40px] w-[40px] h-[40px]">person</mat-icon>
               </div>
               <button class="absolute bottom-0 right-0 bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg hover:bg-indigo-700 transition-colors">
-                <mat-icon style="font-size: 16px; width: 16px; height: 16px;">photo_camera</mat-icon>
+                <mat-icon class="text-base w-4 h-4">photo_camera</mat-icon>
               </button>
             </div>
             <h2 class="text-lg font-bold text-slate-900 truncate">{{ user?.name || 'Your Name' }}</h2>

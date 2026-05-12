@@ -1,11 +1,11 @@
 <div class="p-6 md:p-8 animate-fade-in">
   <!-- Empty Cart -->
   <div *ngIf="cart.items.length === 0" class="text-center py-16">
-    <div class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6" style="background-color:var(--muted);">
-      <mat-icon style="font-size:3rem;width:3rem;height:3rem;color:var(--muted-foreground);">shopping_cart</mat-icon>
+    <div class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 bg-[var(--muted)]">
+      <mat-icon class="text-[3rem] w-[3rem] h-[3rem] text-[var(--muted-foreground)]">shopping_cart</mat-icon>
     </div>
     <h2 class="mb-4">Your cart is empty</h2>
-    <p class="mb-8" style="color:var(--muted-foreground);">Add some products to get started!</p>
+    <p class="mb-8 text-[var(--muted-foreground)]">Add some products to get started!</p>
     <button class="ref-btn ref-btn-primary ref-btn-lg" (click)="continueShopping()">
       Continue Shopping
     </button>
@@ -13,8 +13,8 @@
 
   <!-- Cart with Items -->
   <div *ngIf="cart.items.length > 0">
-    <a (click)="continueShopping()" class="inline-flex items-center gap-2 mb-6 text-sm cursor-pointer hover:underline" style="color:var(--muted-foreground);">
-      <mat-icon style="font-size:1rem;width:1rem;height:1rem;">chevron_left</mat-icon>
+    <a (click)="continueShopping()" class="inline-flex items-center gap-2 mb-6 text-sm cursor-pointer hover:underline text-[var(--muted-foreground)]">
+      <mat-icon class="text-[1rem] w-[1rem] h-[1rem]">chevron_left</mat-icon>
       Continue Shopping
     </a>
 
@@ -27,31 +27,31 @@
           <div class="ref-card-content">
             <div class="flex gap-6">
               <!-- Product thumbnail -->
-              <div class="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center" style="background-color:var(--muted);">
-                <mat-icon style="font-size:2rem;width:2rem;height:2rem;color:var(--muted-foreground);">inventory_2</mat-icon>
+              <div class="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center bg-[var(--muted)]">
+                <mat-icon class="text-[2rem] w-[2rem] h-[2rem] text-[var(--muted-foreground)]">inventory_2</mat-icon>
               </div>
               <div class="flex-1">
                 <div class="flex justify-between mb-2">
                   <div>
                     <h3>{{ item.product.name }}</h3>
-                    <p class="text-sm" style="color:var(--muted-foreground);">{{ item.product.category }}</p>
+                    <p class="text-sm text-[var(--muted-foreground)]">{{ item.product.category }}</p>
                   </div>
-                  <button class="ref-btn ref-btn-ghost ref-btn-icon" style="color:var(--destructive);width:2rem;height:2rem;" (click)="removeItem(getProductId(item.product))">
-                    <mat-icon style="font-size:1.25rem;width:1.25rem;height:1.25rem;">delete</mat-icon>
+                  <button class="ref-btn ref-btn-ghost ref-btn-icon text-[var(--destructive)] w-[2rem] h-[2rem]" (click)="removeItem(getProductId(item.product))">
+                    <mat-icon class="text-[1.25rem] w-[1.25rem] h-[1.25rem]">delete</mat-icon>
                   </button>
                 </div>
 
                 <div class="flex items-center justify-between mt-4">
                   <div class="flex items-center gap-2">
-                    <button class="ref-btn ref-btn-outline ref-btn-icon" style="width:2rem;height:2rem;" (click)="updateQuantity(getProductId(item.product), item.quantity - 1)">
-                      <mat-icon style="font-size:1rem;width:1rem;height:1rem;">remove</mat-icon>
+                    <button class="ref-btn ref-btn-outline ref-btn-icon w-[2rem] h-[2rem]" (click)="updateQuantity(getProductId(item.product), item.quantity - 1)">
+                      <mat-icon class="text-[1rem] w-[1rem] h-[1rem]">remove</mat-icon>
                     </button>
                     <span class="w-12 text-center font-medium">{{ item.quantity }}</span>
-                    <button class="ref-btn ref-btn-outline ref-btn-icon" style="width:2rem;height:2rem;" (click)="updateQuantity(getProductId(item.product), item.quantity + 1)">
-                      <mat-icon style="font-size:1rem;width:1rem;height:1rem;">add</mat-icon>
+                    <button class="ref-btn ref-btn-outline ref-btn-icon w-[2rem] h-[2rem]" (click)="updateQuantity(getProductId(item.product), item.quantity + 1)">
+                      <mat-icon class="text-[1rem] w-[1rem] h-[1rem]">add</mat-icon>
                     </button>
                   </div>
-                  <p class="font-semibold" style="color:var(--primary);">
+                  <p class="font-semibold text-[var(--primary)]">
                     {{ (item.product.price * item.quantity) | currency:'INR':'symbol':'1.0-2' }}
                   </p>
                 </div>
@@ -65,15 +65,15 @@
       <div class="lg:col-span-1">
         <div class="ref-card sticky top-24">
           <div class="ref-card-content space-y-4">
-            <h3 style="font-weight:600;">Order Summary</h3>
+            <h3 class="font-semibold">Order Summary</h3>
             <hr class="ref-separator">
             <div class="space-y-2">
               <div class="flex justify-between">
-                <span style="color:var(--muted-foreground);">Subtotal</span>
+                <span class="text-[var(--muted-foreground)]">Subtotal</span>
                 <span>{{ cart.total | currency:'INR':'symbol':'1.0-2' }}</span>
               </div>
               <div class="flex justify-between">
-                <span style="color:var(--muted-foreground);">Shipping</span>
+                <span class="text-[var(--muted-foreground)]">Shipping</span>
                 <span>FREE</span>
               </div>
             </div>
@@ -85,7 +85,7 @@
             <button class="ref-btn ref-btn-primary ref-btn-lg w-full" (click)="checkout()">
               Proceed to Checkout
             </button>
-            <div class="text-center text-xs" style="color:var(--muted-foreground);">
+            <div class="text-center text-xs text-[var(--muted-foreground)]">
               Secure checkout with SSL encryption
             </div>
           </div>

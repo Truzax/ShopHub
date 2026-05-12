@@ -22,8 +22,8 @@
       <mat-icon class="text-white block">auto_awesome</mat-icon>
     </div>
     <div>
-      <h3 class="font-bold m-0 leading-tight" style="color: white !important;">AI Assistant</h3>
-      <p class="text-xs m-0" style="color: rgba(255, 255, 255, 0.8) !important;">Always here to help</p>
+      <h3 class="font-bold m-0 leading-tight text-white! text-white">AI Assistant</h3>
+      <p class="text-xs m-0 text-[rgba(255,255,255,0.8)]!">Always here to help</p>
     </div>
   </div>
 
@@ -48,9 +48,9 @@
     <!-- Loading indicator -->
     <div *ngIf="isLoading" class="bg-white border border-slate-200 text-slate-500 self-start rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex items-center">
       <div class="flex gap-1">
-        <span class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
-        <span class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
-        <span class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+        <span class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce delay-0"></span>
+        <span class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce delay-150"></span>
+        <span class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce delay-300"></span>
       </div>
     </div>
   </div>
@@ -78,7 +78,7 @@
         type="submit" 
         [disabled]="!newMessage.trim() || isLoading"
         class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center disabled:opacity-50 disabled:bg-slate-400 transition-colors hover:bg-indigo-700">
-        <mat-icon style="font-size: 18px; width: 18px; height: 18px;">arrow_upward</mat-icon>
+        <mat-icon class="text-[18px] w-[18px] h-[18px]">arrow_upward</mat-icon>
       </button>
     </form>
   </div>

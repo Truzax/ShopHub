@@ -19,11 +19,11 @@
   <ng-template #loading>
     <div class="flex flex-col items-center justify-center py-20" *ngIf="!errorMsg">
       <mat-spinner [diameter]="40"></mat-spinner>
-      <span class="text-sm mt-4" style="color:var(--muted-foreground);">Processing analytics...</span>
+      <span class="text-sm mt-4 text-[var(--muted-foreground)]">Processing analytics...</span>
     </div>
   </ng-template>
 
-  <div *ngIf="errorMsg" class="p-4 rounded-lg flex items-center gap-2" style="background-color:#fee2e2;color:#991b1b;">
+  <div *ngIf="errorMsg" class="p-4 rounded-lg flex items-center gap-2 text-[var(--destructive)]">
     <mat-icon>error</mat-icon>
     {{ errorMsg }}
   </div>

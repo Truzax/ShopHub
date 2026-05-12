@@ -79,7 +79,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
                   <div *ngFor="let item of order.products | slice:0:3" class="flex items-center justify-between">
                     <div class="flex items-center gap-3 truncate">
                       <div class="w-8 h-8 rounded bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 text-slate-400">
-                        <mat-icon style="font-size: 16px; width: 16px; height: 16px;">inventory_2</mat-icon>
+                        <mat-icon class="text-base w-4 h-4">inventory_2</mat-icon>
                       </div>
                       <span class="text-sm text-slate-700 truncate font-medium">{{ getProductName(item.product) }}</span>
                       <span class="text-xs text-slate-400">x{{ item.quantity }}</span>
