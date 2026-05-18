@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { AnalyticsService, DashboardResponse } from '../services/analyticsService';
+import { catchAsync } from '../middleware/catchAsync';
 
-export const getDashboardData = async (
+export const getDashboardData = catchAsync(async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  try {
     const { startDate, endDate, category } = req.query;
 
     // Validate required parameters
@@ -29,7 +29,4 @@ export const getDashboardData = async (
       success: true,
       data: dashboardData,
     });
-  } catch (error) {
-    next(error); // Pass to global error handler middleware
-  }
-};
+});

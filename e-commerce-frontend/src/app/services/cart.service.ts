@@ -1,20 +1,21 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable, OnDestroy } from '@angular/core';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { CartItem, Cart } from '../models/cart.model';
 import { Product } from '../models/product.model';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth';
 import { environment } from '../../environments/environment';
-import { tap, filter, take, switchMap, map } from 'rxjs/operators';
+import { tap, filter, take, switchMap, map, takeUntil } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
-export class CartService {
+export class CartService implements OnDestroy {
   private cartSubject = new BehaviorSubject<Cart>({ items: [], total: 0 });
   public cart$ = this.cartSubject.asObservable();
   private apiUrl = `${environment.apiUrl}/cart`;
   private isSyncing = false;
+  private destroy$ = new Subject<void>();
 
   constructor(private http: HttpClient, private authService: AuthService) {
     this.loadCartFromStorage();
@@ -23,7 +24,7 @@ export class CartService {
 
   private initCartSync(): void {
     // When user changes (login/logout)
-    this.authService.currentUser$.subscribe((user) => {
+    this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
       if (user) {
         // User just logged in, sync guest cart to server
         this.mergeAndSyncWithServer();
@@ -33,6 +34,11 @@ export class CartService {
         localStorage.removeItem('cart');
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private getHeaders(): HttpHeaders {
@@ -155,9 +161,13 @@ export class CartService {
     const quantityToAdd = Math.min(quantity, availableQuantity);
 
     if (existingItem) {
-      existingItem.quantity += quantityToAdd;
+      currentCart.items = currentCart.items.map(item => 
+        this.getProductId(item.product) === productId
+          ? { ...item, quantity: item.quantity + quantityToAdd }
+          : item
+      );
     } else {
-      currentCart.items.push({ product, quantity: quantityToAdd });
+      currentCart.items = [...currentCart.items, { product, quantity: quantityToAdd }];
     }
 
     this.updateCartTotal();
@@ -195,7 +205,11 @@ export class CartService {
       }
 
       const nextQuantity = Math.min(quantity, maxQuantity);
-      item.quantity = nextQuantity;
+      currentCart.items = currentCart.items.map(i =>
+        this.getProductId(i.product) === productId
+          ? { ...i, quantity: nextQuantity }
+          : i
+      );
       this.updateCartTotal();
       this.saveAndSync();
 

@@ -4,6 +4,8 @@ import { IProduct } from './Product';
 
 export interface IOrderItem {
     product: IProduct['_id'];
+    name: string;
+    category: string;
     quantity: number;
     price: number;
 }
@@ -20,6 +22,8 @@ export interface IOrder extends Document {
 
 const OrderItemSchema = new Schema<IOrderItem>({
     product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
+    name: { type: String, required: true },
+    category: { type: String, required: true },
     quantity: { type: Number, required: true, min: 1 },
     price: { type: Number, required: true, min: 0 },
 });
@@ -41,28 +45,17 @@ const OrderSchema = new Schema<IOrder>(
     { timestamps: true }
 );
 
-OrderSchema.pre('save', async function() {
+import crypto from 'crypto';
+
+OrderSchema.pre('save', function() {
     if (!this.orderNumber) {
-        let isUnique = false;
-        let generatedNumber = '';
-        
         const date = new Date();
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
-        while (!isUnique) {
-            
-            const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-            generatedNumber = `ORD-${year}${month}${day}-${random}`;
-            
-            // Check if this number already exists
-            const existingOrder = await mongoose.model('Order').findOne({ orderNumber: generatedNumber });
-            if (!existingOrder) {
-                isUnique = true;
-            }
-        }
         
-        this.orderNumber = generatedNumber;
+        const random = crypto.randomBytes(3).toString('hex').toUpperCase();
+        this.orderNumber = `ORD-${year}${month}${day}-${random}`;
     }
 });
 

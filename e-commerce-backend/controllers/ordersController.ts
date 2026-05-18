@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import Order from '../models/Order';
 import Product from '../models/Product';
+import { catchAsync } from '../middleware/catchAsync';
 
-export const createOrder = async (req: Request & { user?: any }, res: Response, next: NextFunction) => {
-    try {
+export const createOrder = catchAsync(async (req: Request & { user?: any }, res: Response, next: NextFunction) => {
         const { products } = req.body;
         
         if (!req.user) {
@@ -32,6 +32,8 @@ export const createOrder = async (req: Request & { user?: any }, res: Response, 
             calculatedTotal += product.price * item.quantity;
             processedProducts.push({
                 product: product._id,
+                name: product.name,
+                category: product.category,
                 quantity: item.quantity,
                 price: product.price
             });
@@ -45,13 +47,9 @@ export const createOrder = async (req: Request & { user?: any }, res: Response, 
         });
 
         res.status(201).json(newOrder);
-    } catch (error) {
-        next(error);
-    }
-};
+});
 
-export const getOrders = async (req: Request & { user?: any }, res: Response, next: NextFunction) => {
-    try {
+export const getOrders = catchAsync(async (req: Request & { user?: any }, res: Response, next: NextFunction) => {
         if (!req.user) {
             return res.status(401).json({ message: 'User not authenticated' });
         }
@@ -79,13 +77,9 @@ export const getOrders = async (req: Request & { user?: any }, res: Response, ne
             pages: Math.ceil(total / limit),
             data: orders
         });
-    } catch (error) {
-        next(error);
-    }
-};
+});
 
-export const getOrderById = async (req: Request & { user?: any }, res: Response, next: NextFunction) => {
-    try {
+export const getOrderById = catchAsync(async (req: Request & { user?: any }, res: Response, next: NextFunction) => {
         if (!req.user) {
             return res.status(401).json({ message: 'User not authenticated' });
         }
@@ -103,13 +97,9 @@ export const getOrderById = async (req: Request & { user?: any }, res: Response,
         }
 
         res.status(200).json(order);
-    } catch (error) {
-        next(error);
-    }
-};
+});
 
-export const updateOrderStatus = async (req: Request & { user?: any }, res: Response, next: NextFunction) => {
-    try {
+export const updateOrderStatus = catchAsync(async (req: Request & { user?: any }, res: Response, next: NextFunction) => {
         const { status } = req.body;
         
         const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
@@ -154,7 +144,4 @@ export const updateOrderStatus = async (req: Request & { user?: any }, res: Resp
         await order.save();
 
         res.status(200).json(order);
-    } catch (error) {
-        next(error);
-    }
-};
+});

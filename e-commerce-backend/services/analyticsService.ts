@@ -91,22 +91,13 @@ export class AnalyticsService {
 
     const pipeline: any[] = [
       { $match: matchStage },
-      { $unwind: { path: '$products', preserveNullAndEmptyArrays: true } },
-      {
-        $lookup: {
-          from: 'products',
-          localField: 'products.product',
-          foreignField: '_id',
-          as: 'productDetails',
-        },
-      },
-      { $unwind: { path: '$productDetails', preserveNullAndEmptyArrays: true } },
+      { $unwind: { path: '$products', preserveNullAndEmptyArrays: true } }
     ];
 
     if (normalizedCategory) {
       pipeline.push({
         $match: {
-          'productDetails.category': {
+          'products.category': {
             $regex: `^${normalizedCategory.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`,
             $options: 'i',
           },
@@ -139,8 +130,8 @@ export class AnalyticsService {
         topProducts: [
           {
             $group: {
-              _id: '$productDetails._id',
-              name: { $first: '$productDetails.name' },
+              _id: '$products.product',
+              name: { $first: '$products.name' },
               revenue: { $sum: { $multiply: ['$products.price', '$products.quantity'] } },
             },
           },
@@ -182,7 +173,7 @@ export class AnalyticsService {
           },
         ],
         categoryDistribution: [
-          { $group: { _id: '$productDetails.category', value: { $sum: '$products.quantity' } } },
+          { $group: { _id: '$products.category', value: { $sum: '$products.quantity' } } },
           { $project: { name: '$_id', value: 1, _id: 0 } },
         ],
         activeCustomers: [
