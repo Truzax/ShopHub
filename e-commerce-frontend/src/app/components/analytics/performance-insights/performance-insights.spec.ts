@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PerformanceInsights } from './performance-insights';
+import { PerformanceInsightsComponent as PerformanceInsights } from './performance-insights';
 
 describe('PerformanceInsights', () => {
   let component: PerformanceInsights;

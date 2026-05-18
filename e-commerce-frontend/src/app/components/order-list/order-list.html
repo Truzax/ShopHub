@@ -39,10 +39,32 @@
             <th mat-header-cell *matHeaderCellDef>Status</th>
             <td mat-cell *matCellDef="let order">
               <ng-container *ngIf="isAdmin">
-                <mat-form-field appearance="fill" class="w-[150px] m-0">
+                <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-[170px] m-0">
                   <mat-select [ngModel]="order.status" (ngModelChange)="updateStatus(order, $event)">
+                    <mat-select-trigger>
+                      <span class="ref-badge inline-flex w-full items-center justify-center text-sm"
+                        [ngClass]="{
+                          'ref-status-pending': order.status === 'pending',
+                          'ref-status-processing': order.status === 'processing',
+                          'ref-status-shipped': order.status === 'shipped',
+                          'ref-status-delivered': order.status === 'delivered',
+                          'ref-status-cancelled': order.status === 'cancelled'
+                        }">
+                        {{ order.status | titlecase }}
+                      </span>
+                    </mat-select-trigger>
                     <mat-option *ngFor="let status of statusOptions" [value]="status">
-                      {{ status | titlecase }}
+                      <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full"
+                          [ngClass]="{
+                            'bg-yellow-500': status === 'pending',
+                            'bg-blue-500': status === 'processing',
+                            'bg-purple-500': status === 'shipped',
+                            'bg-emerald-500': status === 'delivered',
+                            'bg-red-500': status === 'cancelled'
+                          }"></span>
+                        {{ status | titlecase }}
+                      </div>
                     </mat-option>
                   </mat-select>
                 </mat-form-field>

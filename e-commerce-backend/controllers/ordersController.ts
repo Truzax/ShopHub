@@ -63,6 +63,7 @@ export const getOrders = async (req: Request & { user?: any }, res: Response, ne
         const query = req.user.role === 'admin' ? {} : { user: req.user._id };
         
         const orders = await Order.find(query)
+            .sort({ date: -1 })
             .populate('user', 'name email')
             .populate('products.product', 'name price category')
             .skip(skip)

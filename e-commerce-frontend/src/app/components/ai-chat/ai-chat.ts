@@ -50,7 +50,7 @@ export class AiChatComponent implements OnInit, AfterViewChecked {
   }
 
   setupRoleContext() {
-    this.messages = []; // Clear history on role switch/login
+    this.messages = [];
 
     if (this.isAdmin) {
       this.greeting = 'Hello! I am your AI Business Assistant. I can help you analyze sales, check stock, and manage operations.';
