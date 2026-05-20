@@ -72,24 +72,32 @@ export class DashboardChartComponent implements OnChanges, OnDestroy {
   }
 
   private getChartData() {
+    const style = getComputedStyle(document.documentElement);
+    const primary = style.getPropertyValue('--chart-1').trim() || '#4f46e5';
+    const secondary = style.getPropertyValue('--chart-2').trim() || '#14b8a6';
+    const chart3 = style.getPropertyValue('--chart-3').trim() || '#f59e0b';
+    const chart4 = style.getPropertyValue('--chart-4').trim() || '#8b5cf6';
+    const chart5 = style.getPropertyValue('--chart-5').trim() || '#ec4899';
+
     if (this.type === 'line') {
       return {
         labels: this.data.map(d => d.date),
         datasets: [{
           label: 'Revenue',
           data: this.data.map(d => d.revenue),
-          borderColor: '#4f46e5',
-          backgroundColor: 'rgba(79, 70, 229, 0.1)',
+          borderColor: primary,
+          backgroundColor: `color-mix(in srgb, ${primary} 10%, transparent)`,
           fill: true,
           tension: 0.4
         }]
       };
     } else if (this.type === 'pie') {
+      const paletteColors = [primary, secondary, chart3, chart4, chart5];
       return {
         labels: this.data.map(d => d.name),
         datasets: [{
           data: this.data.map(d => d.value),
-          backgroundColor: this.data.map(d => d.color || '#4f46e5'),
+          backgroundColor: this.data.map((d, i) => d.color || paletteColors[i % paletteColors.length]),
           borderWidth: 0
         }]
       };
@@ -99,7 +107,7 @@ export class DashboardChartComponent implements OnChanges, OnDestroy {
         datasets: [{
           label: 'Orders',
           data: this.data.map(d => d.count),
-          backgroundColor: '#4f46e5',
+          backgroundColor: primary,
           borderRadius: 8
         }]
       };

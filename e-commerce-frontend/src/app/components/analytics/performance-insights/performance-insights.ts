@@ -58,19 +58,19 @@ export class PerformanceInsightsComponent implements OnInit {
 
   getColorClassForType(type: string): string {
     switch(type) {
-      case 'warning': return 'bg-amber-50 border-amber-200 text-amber-800';
-      case 'success': return 'bg-emerald-50 border-emerald-200 text-emerald-800';
-      case 'recommendation': return 'bg-blue-50 border-blue-200 text-blue-800';
-      case 'info': default: return 'bg-slate-50 border-slate-200 text-slate-800';
+      case 'warning': return 'border-l-amber-400 dark:border-l-amber-500';
+      case 'success': return 'border-l-emerald-400 dark:border-l-emerald-500';
+      case 'recommendation': return 'border-l-blue-400 dark:border-l-blue-500';
+      case 'info': default: return 'border-l-[var(--muted-foreground)]';
     }
   }
 
   getIconColorClassForType(type: string): string {
     switch(type) {
-      case 'warning': return 'text-amber-600';
-      case 'success': return 'text-emerald-600';
-      case 'recommendation': return 'text-blue-600';
-      case 'info': default: return 'text-slate-600';
+      case 'warning': return 'text-amber-600 dark:text-amber-400';
+      case 'success': return 'text-emerald-600 dark:text-emerald-400';
+      case 'recommendation': return 'text-blue-600 dark:text-blue-400';
+      case 'info': default: return 'text-slate-600 dark:text-slate-300';
     }
   }
 }

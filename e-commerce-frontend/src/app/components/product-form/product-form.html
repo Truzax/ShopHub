@@ -11,7 +11,7 @@
     </p>
   </div>
 
-  <div *ngIf="errorMessage" class="p-3 mb-6 rounded-lg text-sm bg-red-100 text-red-800">
+  <div *ngIf="errorMessage" class="p-3 mb-6 rounded-lg text-sm bg-[color-mix(in_srgb,var(--destructive)_12%,transparent)] text-[var(--destructive)] border border-[var(--destructive)]/30">
     {{ errorMessage }}
   </div>
 
@@ -23,13 +23,13 @@
         <div class="ref-card">
           <div class="ref-card-header flex justify-between items-center">
             <h3 class="ref-card-title">Basic Information</h3>
-            <button type="button" class="ref-btn text-indigo-600 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 flex items-center px-3 py-1 text-sm rounded-md transition-colors" (click)="generateAiDescription()" [disabled]="isGeneratingAi">
+            <button type="button" class="ref-btn text-[var(--accent-foreground)] bg-[var(--accent)] border border-[var(--border)] hover:opacity-90 flex items-center px-3 py-1 text-sm rounded-md transition-opacity" (click)="generateAiDescription()" [disabled]="isGeneratingAi">
               <mat-spinner *ngIf="isGeneratingAi" diameter="16" class="mr-2"></mat-spinner>
               <mat-icon *ngIf="!isGeneratingAi" class="mr-1 text-base w-4 h-4">auto_awesome</mat-icon>
               {{ isGeneratingAi ? 'Generating...' : 'Generate AI Content' }}
             </button>
           </div>
-          <div *ngIf="aiError" class="mx-6 p-3 rounded-lg text-sm bg-red-50 text-red-700 border border-red-200">
+          <div *ngIf="aiError" class="mx-6 p-3 rounded-lg text-sm bg-[color-mix(in_srgb,var(--destructive)_12%,transparent)] text-[var(--destructive)] border border-[var(--destructive)]/30">
             {{ aiError }}
           </div>
           <div class="ref-card-content space-y-4">
@@ -69,9 +69,9 @@
             </div>
             
             <!-- AI Generated Content Fields -->
-            <div class="border-t border-slate-100 pt-4 mt-2">
-              <h4 class="text-sm font-semibold text-slate-700 mb-3 flex items-center">
-                <mat-icon class="mr-1 text-indigo-500 text-[18px] w-[18px] h-[18px]">description</mat-icon>
+            <div class="border-t border-[var(--border)] pt-4 mt-2">
+              <h4 class="text-sm font-semibold text-[var(--foreground)] mb-3 flex items-center">
+                <mat-icon class="mr-1 text-[var(--primary)] text-[18px] w-[18px] h-[18px]">description</mat-icon>
                 Detailed Information
               </h4>
               

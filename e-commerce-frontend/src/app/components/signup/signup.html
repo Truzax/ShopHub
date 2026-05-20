@@ -7,7 +7,7 @@
 
     <div class="auth-card-content">
       @if (error) {
-        <div class="p-3 mb-4 rounded-lg text-sm bg-red-100 text-red-800">{{ error }}</div>
+        <div class="p-3 mb-4 rounded-lg text-sm bg-[color-mix(in_srgb,var(--destructive)_12%,transparent)] text-[var(--destructive)] border border-[var(--destructive)]/30">{{ error }}</div>
       }
 
       <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" novalidate class="space-y-4">

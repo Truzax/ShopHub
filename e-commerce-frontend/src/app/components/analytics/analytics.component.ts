@@ -37,7 +37,7 @@ export class AnalyticsComponent implements OnInit {
   private productService = inject(ProductService);
   
   filters: DashboardFilter = {
-    startDate: new Date(new Date().setDate(new Date().getDate() - 90)).toISOString().substring(0,10),
+    startDate: new Date(new Date().setDate(new Date().getDate() - 30)).toISOString().substring(0,10),
     endDate: new Date().toISOString().substring(0,10),
     category: ''
   };

@@ -249,13 +249,21 @@ a { text-decoration: none; }
   color: var(--destructive-foreground);
 }
 
-/* Status Badges */
+/* Status Badges — Light Mode */
 .ref-status-pending { background-color: #fef3c7; color: #92400e; }
 .ref-status-processing { background-color: #dbeafe; color: #1e40af; }
 .ref-status-shipped { background-color: #ede9fe; color: #5b21b6; }
 .ref-status-delivered { background-color: #d1fae5; color: #065f46; }
 .ref-status-cancelled { background-color: #fee2e2; color: #991b1b; }
 .ref-status-completed { background-color: #d1fae5; color: #065f46; }
+
+/* Status Badges — Dark Mode */
+.dark .ref-status-pending { background-color: rgba(245,158,11,0.15); color: #fbbf24; }
+.dark .ref-status-processing { background-color: rgba(59,130,246,0.15); color: #60a5fa; }
+.dark .ref-status-shipped { background-color: rgba(139,92,246,0.15); color: #a78bfa; }
+.dark .ref-status-delivered { background-color: rgba(16,185,129,0.15); color: #34d399; }
+.dark .ref-status-cancelled { background-color: rgba(239,68,68,0.15); color: #f87171; }
+.dark .ref-status-completed { background-color: rgba(16,185,129,0.15); color: #34d399; }
 
 /* Separator */
 .ref-separator {
@@ -409,6 +417,114 @@ a { text-decoration: none; }
 /* Material snackbar */
 .mat-mdc-snack-bar-container {
   border-radius: var(--radius) !important;
+}
+
+/* ===== Dark Mode Material Overrides ===== */
+
+/* Dialog surface */
+.dark .mat-mdc-dialog-container .mdc-dialog__surface {
+  background-color: var(--card) !important;
+  color: var(--foreground) !important;
+}
+
+/* Select panel / dropdown overlay */
+.dark .mat-mdc-select-panel {
+  background-color: var(--card) !important;
+}
+.dark .mat-mdc-option {
+  color: var(--foreground);
+}
+.dark .mat-mdc-option:hover:not(.mdc-list-item--disabled),
+.dark .mat-mdc-option:focus:not(.mdc-list-item--disabled) {
+  background-color: var(--muted) !important;
+}
+.dark .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+  background-color: color-mix(in srgb, var(--primary) 15%, transparent) !important;
+}
+
+/* Outlined text field borders */
+.dark .mdc-text-field--outlined .mdc-notched-outline__leading,
+.dark .mdc-text-field--outlined .mdc-notched-outline__notch,
+.dark .mdc-text-field--outlined .mdc-notched-outline__trailing {
+  border-color: var(--border) !important;
+}
+.dark .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline__leading,
+.dark .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline__notch,
+.dark .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline__trailing {
+  border-color: var(--muted-foreground) !important;
+}
+.dark .mdc-text-field--outlined.mdc-text-field--focused .mdc-notched-outline__leading,
+.dark .mdc-text-field--outlined.mdc-text-field--focused .mdc-notched-outline__notch,
+.dark .mdc-text-field--outlined.mdc-text-field--focused .mdc-notched-outline__trailing {
+  border-color: var(--ring) !important;
+}
+.dark .mdc-text-field {
+  background-color: var(--input-background) !important;
+}
+.dark .mdc-floating-label {
+  color: var(--muted-foreground) !important;
+}
+.dark .mdc-floating-label--float-above {
+  color: var(--ring) !important;
+}
+
+/* Paginator */
+.dark .mat-mdc-paginator {
+  background-color: var(--card) !important;
+  color: var(--foreground) !important;
+}
+.dark .mat-mdc-paginator .mat-mdc-icon-button {
+  color: var(--foreground) !important;
+}
+.dark .mat-mdc-paginator .mat-mdc-icon-button:disabled {
+  color: var(--muted-foreground) !important;
+}
+
+/* Table */
+.dark .mat-mdc-table {
+  background-color: var(--card) !important;
+}
+.dark .mat-mdc-row,
+.dark .mat-mdc-header-row,
+.dark .mat-mdc-footer-row {
+  background-color: var(--card) !important;
+  border-bottom-color: var(--border) !important;
+}
+.dark .mat-mdc-row:hover .mat-mdc-cell {
+  background-color: var(--muted) !important;
+}
+.dark .mat-mdc-header-cell {
+  color: var(--muted-foreground) !important;
+  background-color: var(--muted) !important;
+  border-bottom-color: var(--border) !important;
+}
+.dark .mat-mdc-cell {
+  color: var(--foreground) !important;
+  border-bottom-color: var(--border) !important;
+}
+
+/* Menu / dropdown panel */
+.dark .mat-mdc-menu-panel {
+  background-color: var(--card) !important;
+}
+.dark .mat-mdc-menu-item {
+  color: var(--foreground) !important;
+}
+.dark .mat-mdc-menu-item:hover {
+  background-color: var(--muted) !important;
+}
+
+/* Divider */
+.dark .mat-divider {
+  border-top-color: var(--border) !important;
+}
+
+/* Form field — select trigger text */
+.dark .mat-mdc-select-value-text {
+  color: var(--foreground) !important;
+}
+.dark .mat-mdc-select-arrow {
+  color: var(--muted-foreground) !important;
 }
 
 /* Material spinner */

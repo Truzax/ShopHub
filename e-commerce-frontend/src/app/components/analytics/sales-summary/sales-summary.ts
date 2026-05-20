@@ -1,22 +1,32 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, ChangeDetectorRef, Input } from '@angular/core';
+import { CommonModule, CurrencyPipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { AiService } from '../../../services/ai.service';
 import { AiSalesSummary } from '../../../models/ai.model';
+import { DashboardData } from '../../../models/dashboard.model';
 
 @Component({
   selector: 'app-sales-summary',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatProgressSpinnerModule, MatIconModule],
+  imports: [CommonModule, CurrencyPipe, MatCardModule, MatProgressSpinnerModule, MatIconModule],
   templateUrl: './sales-summary.html',
   styleUrls: ['./sales-summary.css']
 })
 export class SalesSummaryComponent implements OnInit {
+  /** Real dashboard data passed from the parent AnalyticsComponent */
+  @Input() dashboardData: DashboardData | null = null;
+
   summary: AiSalesSummary | null = null;
   loading: boolean = true;
   error: string | null = null;
+
+  /** Sum of all revenue data points — the authoritative number from the DB */
+  get totalRevenue(): number {
+    if (!this.dashboardData?.revenueOverTime?.length) return 0;
+    return this.dashboardData.revenueOverTime.reduce((sum, p) => sum + p.revenue, 0);
+  }
 
   constructor(private aiService: AiService, private cdr: ChangeDetectorRef) {}
 
@@ -28,7 +38,7 @@ export class SalesSummaryComponent implements OnInit {
     this.loading = true;
     this.error = null;
     
-    // Defaulting to last 30 days for demo purposes
+    // Matches the parent AnalyticsComponent default filter: last 30 days
     const endDate = new Date();
     const startDate = new Date();
     startDate.setDate(endDate.getDate() - 30);

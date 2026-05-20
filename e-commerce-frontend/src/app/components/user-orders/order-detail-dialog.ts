@@ -13,8 +13,8 @@ import { Order } from '../../models/order.model';
   template: `
     <div class="p-0 overflow-hidden rounded-3xl animate-fade-in min-w-[450px] max-w-[600px]">
       <!-- Header -->
-      <div class="bg-indigo-600 p-8 text-white relative">
-        <button mat-icon-button (click)="dialogRef.close()" class="absolute top-4 right-4 text-white/80 hover:text-white hover:bg-white/10">
+      <div class="bg-[var(--primary)] p-8 text-[var(--primary-foreground)] relative">
+        <button mat-icon-button (click)="dialogRef.close()" class="absolute top-4 right-4 opacity-80 hover:opacity-100 hover:bg-white/10">
           <mat-icon>close</mat-icon>
         </button>
         <div class="flex items-center gap-4 mb-4">
@@ -23,38 +23,38 @@ import { Order } from '../../models/order.model';
           </div>
           <div>
             <h2 class="text-2xl font-bold m-0">{{ data.orderNumber }}</h2>
-            <p class="text-indigo-100/80 m-0 text-sm">{{ data.date | date:'MMMM d, y, h:mm a' }}</p>
+            <p class="opacity-80 m-0 text-sm">{{ data.date | date:'MMMM d, y, h:mm a' }}</p>
           </div>
         </div>
         <div class="flex items-center gap-3">
           <span class="px-3 py-1 bg-white/20 rounded-full text-xs font-bold uppercase tracking-widest backdrop-blur-md">
             {{ data.status }}
           </span>
-          <span class="px-3 py-1 bg-emerald-500/30 rounded-full text-xs font-bold uppercase tracking-widest backdrop-blur-md text-emerald-50">
+          <span class="px-3 py-1 bg-emerald-500/30 rounded-full text-xs font-bold uppercase tracking-widest backdrop-blur-md opacity-90">
             Payment: Paid
           </span>
         </div>
       </div>
 
       <!-- Body -->
-      <div class="p-8 max-h-[60vh] overflow-y-auto bg-white">
-        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+      <div class="p-8 max-h-[60vh] overflow-y-auto bg-[var(--card)]">
+        <h3 class="text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-widest mb-6 flex items-center gap-2">
           <mat-icon class="text-sm h-4 w-4">shopping_bag</mat-icon> Order Items
         </h3>
         
         <div class="space-y-6">
           <div *ngFor="let item of data.products" class="flex items-start justify-between gap-4">
             <div class="flex items-start gap-4">
-              <div class="w-12 h-12 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center text-slate-400 flex-shrink-0">
+              <div class="w-12 h-12 bg-[var(--muted)] border border-[var(--border)] rounded-xl flex items-center justify-center text-[var(--muted-foreground)] flex-shrink-0">
                 <mat-icon>inventory_2</mat-icon>
               </div>
               <div>
-                <h4 class="font-bold text-slate-900 leading-tight mb-1">{{ getProductName(item.product) }}</h4>
-                <p class="text-sm text-slate-500">Qty: {{ item.quantity }} × {{ item.price | currency:'INR':'symbol':'1.0-0' }}</p>
+                <h4 class="font-bold text-[var(--foreground)] leading-tight mb-1">{{ getProductName(item.product) }}</h4>
+                <p class="text-sm text-[var(--muted-foreground)]">Qty: {{ item.quantity }} × {{ item.price | currency:'INR':'symbol':'1.0-0' }}</p>
               </div>
             </div>
             <div class="text-right">
-              <p class="font-bold text-slate-900">{{ (item.price * item.quantity) | currency:'INR':'symbol':'1.0-0' }}</p>
+              <p class="font-bold text-[var(--foreground)]">{{ (item.price * item.quantity) | currency:'INR':'symbol':'1.0-0' }}</p>
             </div>
           </div>
         </div>
@@ -63,32 +63,32 @@ import { Order } from '../../models/order.model';
 
         <!-- Summary -->
         <div class="space-y-3 mt-1">
-          <div class="flex justify-between text-sm text-slate-500">
+          <div class="flex justify-between text-sm text-[var(--muted-foreground)]">
             <span>Subtotal</span>
             <span>{{ data.total | currency:'INR':'symbol':'1.0-0' }}</span>
           </div>
-          <div class="flex justify-between text-sm text-slate-500">
+          <div class="flex justify-between text-sm text-[var(--muted-foreground)]">
             <span>Shipping</span>
-            <span class="text-emerald-600 font-medium">FREE</span>
+            <span class="text-[var(--success)] font-medium">FREE</span>
           </div>
-          <div class="flex justify-between text-lg font-bold text-slate-900 pt-3 border-t border-slate-100">
+          <div class="flex justify-between text-lg font-bold text-[var(--foreground)] pt-3 border-t border-[var(--border)]">
             <span>Total Amount</span>
-            <span class="text-indigo-600">{{ data.total | currency:'INR':'symbol':'1.0-0' }}</span>
+            <span class="text-[var(--primary)]">{{ data.total | currency:'INR':'symbol':'1.0-0' }}</span>
           </div>
         </div>
 
-        <!-- Customer Note (Optional) -->
-        <div class="mt-8 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-          <div class="flex items-center gap-2 text-slate-600 mb-2">
+        <!-- Customer Note -->
+        <div class="mt-8 p-4 bg-[var(--muted)] rounded-2xl border border-[var(--border)]">
+          <div class="flex items-center gap-2 text-[var(--muted-foreground)] mb-2">
             <mat-icon class="text-sm h-4 w-4">info</mat-icon>
             <span class="text-xs font-bold uppercase tracking-wider">Note</span>
           </div>
-          <p class="text-xs text-slate-500 m-0">This order is protected by our standard return policy. If you have any issues, please contact support.</p>
+          <p class="text-xs text-[var(--muted-foreground)] m-0">This order is protected by our standard return policy. If you have any issues, please contact support.</p>
         </div>
       </div>
 
       <!-- Footer -->
-      <div class="p-6 bg-slate-50 border-t border-slate-100 flex justify-end">
+      <div class="p-6 bg-[var(--muted)] border-t border-[var(--border)] flex justify-end">
         <button class="ref-btn ref-btn-primary px-8" (click)="dialogRef.close()">Close Details</button>
       </div>
     </div>
@@ -98,6 +98,7 @@ import { Order } from '../../models/order.model';
     ::ng-deep .mat-mdc-dialog-container .mdc-dialog__surface {
       border-radius: 24px !important;
       overflow: hidden;
+      background-color: var(--card) !important;
     }
   `]
 })
