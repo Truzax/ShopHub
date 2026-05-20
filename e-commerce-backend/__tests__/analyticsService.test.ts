@@ -61,5 +61,33 @@ describe('Analytics Service', () => {
       expect(result.trends.revenue).toBe(100);
       expect(result.trends.orders).toBe(100);
     });
+
+    it('should remove null categories and map parsing failures to Others', async () => {
+      const currentData = [{
+        revenueOverTime: [{ date: '2026-05-14', revenue: 100 }],
+        totalOrders: [{ count: 1 }],
+        activeCustomers: [{ count: 1 }],
+        avgOrderValue: [{ avg: 100 }],
+        customerOrderCounts: [],
+        categoryDistribution: [
+          { name: null, value: 3 },
+          { name: '   ', value: 2 },
+          { name: '{"name":"Electronics"}', value: 4 },
+          { name: '{bad-json}', value: 5 },
+        ],
+      }];
+
+      const previousData = [{}];
+
+      (Order.aggregate as jest.Mock)
+        .mockResolvedValueOnce(currentData)
+        .mockResolvedValueOnce(previousData);
+
+      const result = await AnalyticsService.getDashboardData('2026-05-01', '2026-05-14');
+
+      expect(result.categoryDistribution.some((c) => c.name === null as any)).toBe(false);
+      expect(result.categoryDistribution.some((c) => c.name === 'Electronics')).toBe(true);
+      expect(result.categoryDistribution.some((c) => c.name === 'Others')).toBe(true);
+    });
   });
 });

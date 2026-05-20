@@ -31,6 +31,55 @@ export interface DashboardResponse {
 }
 
 export class AnalyticsService {
+  private static normalizeCategoryName(rawCategory: unknown): string | null {
+    if (rawCategory === null || rawCategory === undefined) return null;
+
+    try {
+      if (typeof rawCategory === 'string') {
+        const trimmed = rawCategory.trim();
+        if (!trimmed) return null;
+
+        const lowered = trimmed.toLowerCase();
+        if (lowered === 'null' || lowered === 'undefined') return null;
+
+        const looksLikeJson =
+          (trimmed.startsWith('{') && trimmed.endsWith('}')) ||
+          (trimmed.startsWith('[') && trimmed.endsWith(']')) ||
+          (trimmed.startsWith('"') && trimmed.endsWith('"'));
+
+        if (!looksLikeJson) return trimmed;
+
+        const parsed = JSON.parse(trimmed);
+        if (typeof parsed === 'string') {
+          const parsedText = parsed.trim();
+          return parsedText || 'Others';
+        }
+
+        if (parsed && typeof parsed === 'object') {
+          const candidate = (parsed as any).name ?? (parsed as any).category ?? (parsed as any).label;
+          if (typeof candidate === 'string' && candidate.trim()) {
+            return candidate.trim();
+          }
+        }
+
+        return 'Others';
+      }
+
+      if (typeof rawCategory === 'object') {
+        const candidate = (rawCategory as any).name ?? (rawCategory as any).category ?? (rawCategory as any).label;
+        if (typeof candidate === 'string' && candidate.trim()) {
+          return candidate.trim();
+        }
+        return 'Others';
+      }
+
+      const primitive = String(rawCategory).trim();
+      return primitive || null;
+    } catch {
+      return 'Others';
+    }
+  }
+
   static async getDashboardData(
     startDate: string,
     endDate: string,
@@ -238,16 +287,28 @@ export class AnalyticsService {
     const returningCustomers = facetData.customerOrderCounts?.filter((c: any) => c.count > 1).length || 0;
     const returnCustomerRate = totalCustomers > 0 ? Math.round((returningCustomers / totalCustomers) * 1000) / 10 : 0;
 
+    const categoryTotals = new Map<string, number>();
+    for (const category of facetData.categoryDistribution || []) {
+      const normalizedName = this.normalizeCategoryName(category?.name);
+      if (!normalizedName) continue;
+
+      const value = Number(category?.value) || 0;
+      categoryTotals.set(normalizedName, (categoryTotals.get(normalizedName) || 0) + value);
+    }
+
+    const categoryDistribution = Array.from(categoryTotals.entries()).map(([name, value], index) => ({
+      name,
+      value,
+      color: colorMap[name] || defaultColors[index % defaultColors.length],
+    }));
+
     return {
       revenueOverTime: facetData.revenueOverTime || [],
       totalOrders: facetData.totalOrders?.[0]?.count || 0,
       ordersByStatus: facetData.ordersByStatus || [],
       topProducts: facetData.topProducts || [],
       recentOrders: facetData.recentOrders || [],
-      categoryDistribution: (facetData.categoryDistribution || []).map((c: any, i: number) => ({
-        ...c,
-        color: colorMap[c.name] || defaultColors[i % defaultColors.length]
-      })),
+      categoryDistribution,
       hourlyOrders: facetData.hourlyOrders || [],
       activeCustomers: facetData.activeCustomers?.[0]?.count || 0,
       avgOrderValue: Math.round((facetData.avgOrderValue?.[0]?.avg || 0) * 100) / 100,

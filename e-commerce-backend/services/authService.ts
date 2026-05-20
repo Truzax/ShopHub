@@ -5,6 +5,25 @@ import nodemailer from 'nodemailer';
 
 const ACCESS_TOKEN_EXPIRES = process.env.JWT_EXPIRES_IN || '15m';
 
+const SMTP_PORT = parseInt(process.env.SMTP_PORT || '587', 10);
+const SMTP_SECURE = process.env.SMTP_SECURE === 'true';
+
+function hasSmtpConfig() {
+  return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
+}
+
+function getSmtpTransporter() {
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: SMTP_PORT,
+    secure: SMTP_SECURE,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+}
+
 export class AuthService {
   static generateAccessToken(user: any) {
     const secret = process.env.JWT_SECRET!;
@@ -97,23 +116,35 @@ export class AuthService {
     const frontend = process.env.FRONTEND_ORIGIN || 'http://localhost:4200';
     const resetUrl = `${frontend}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
 
-    if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-      const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: parseInt(process.env.SMTP_PORT || '587', 10),
-        secure: process.env.SMTP_SECURE === 'true',
-        auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-      });
+    if (hasSmtpConfig()) {
+      const transporter = getSmtpTransporter();
 
-      const mailOptions = {
-        from: process.env.SMTP_FROM || 'no-reply@example.com',
+      await transporter.sendMail({
+        from: process.env.SMTP_FROM || 'E-Commerce Analytics <no-reply@example.com>',
         to: user.email,
-        subject: 'Reset your password - E‑Com Analytics',
-        text: `Reset your password using this link: ${resetUrl}`,
-        html: `...`,
-      };
-
-      await transporter.sendMail(mailOptions);
+        subject: 'Reset your password - E-Commerce Analytics',
+        text: [
+          'We received a request to reset your password.',
+          `Reset link: ${resetUrl}`,
+          'This link expires in 1 hour.',
+          'If you did not request this change, you can ignore this email.',
+        ].join('\n\n'),
+        html: `
+          <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #111;">
+            <h2 style="margin-bottom: 12px;">Reset your password</h2>
+            <p>We received a request to reset your password.</p>
+            <p>
+              <a href="${resetUrl}" style="display: inline-block; padding: 10px 14px; background: #111; color: #fff; text-decoration: none; border-radius: 6px;">
+                Reset Password
+              </a>
+            </p>
+            <p>Or copy and paste this link into your browser:</p>
+            <p><a href="${resetUrl}">${resetUrl}</a></p>
+            <p>This link expires in 1 hour.</p>
+            <p>If you did not request this, you can safely ignore this email.</p>
+          </div>
+        `,
+      });
     }
     return resetUrl;
   }

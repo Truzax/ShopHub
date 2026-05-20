@@ -36,7 +36,6 @@ export class ForgotPassword {
     this.auth.forgotPassword(email).subscribe({
       next: (res) => {
         this.message = res?.message || 'If an account exists, a reset link has been sent';
-        if (res?.resetUrl) this.message += `\n${res.resetUrl}`;
         this.cdr.detectChanges();
       },
       error: (err) => {

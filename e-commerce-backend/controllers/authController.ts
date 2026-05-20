@@ -84,19 +84,19 @@ export const forgotPassword = catchAsync(async (req: Request, res: Response, nex
   }
 
   const isDev = process.env.NODE_ENV === 'development';
-  const hasSmtp = !!process.env.SMTP_HOST;
+  const hasSmtp = !!(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
 
   if (!hasSmtp) {
     if (isDev) {
       console.log('Password reset link:', resetUrl);
-      return res.json({ message: 'Reset link generated', resetUrl });
+      return res.json({ message: 'Reset link generated' });
     }
     return res.json({ message: 'Reset link generated' });
   }
 
   if (isDev) {
     console.log('Password reset link:', resetUrl);
-    return res.json({ message: 'Reset link sent', resetUrl });
+    return res.json({ message: 'Reset link sent' });
   }
   return res.json({ message: 'Reset link sent' });
 });
