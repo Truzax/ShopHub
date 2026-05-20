@@ -1,0 +1,9 @@
+/* Performance Insights styles */
+:host {
+  display: block;
+}
+
+/* Type badge — colored text on muted background */
+.insight-type-badge {
+  opacity: 0.9;
+}

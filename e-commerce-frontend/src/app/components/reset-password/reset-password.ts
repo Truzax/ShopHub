@@ -37,18 +37,18 @@ export class ResetPassword {
         this.auth.validateReset(this.token, this.email).subscribe({
           next: () => {
             this.valid = true;
-            this.cdr.detectChanges();
+            this.cdr.markForCheck();
           },
           error: (err) => {
             this.valid = false;
             this.error = err?.error?.message || 'Invalid or expired reset link';
-            this.cdr.detectChanges();
+            this.cdr.markForCheck();
           },
         });
       } else {
         this.valid = false;
         this.error = 'Missing reset token or email';
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       }
     });
 
@@ -91,7 +91,7 @@ export class ResetPassword {
 
     this.auth.resetPassword({ email: this.email, token: this.token, password }).subscribe({
       next: (res) => {
-        this.message = res?.message || 'Password reset successful';
+        this.message = (res as any)?.message || 'Password reset successful';
         this.cdr.detectChanges();
         setTimeout(() => this.router.navigate(['/reset-confirmation']), 800);
       },

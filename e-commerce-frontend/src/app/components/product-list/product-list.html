@@ -1,0 +1,171 @@
+<div [ngClass]="isAdmin ? 'p-6 md:p-8' : ''" class="animate-fade-in">
+  <!-- Admin View: Inventory Table -->
+  <ng-container *ngIf="isAdmin">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1>Inventory Management</h1>
+        <p class="mt-1 text-[var(--muted-foreground)]">Manage your product catalog</p>
+      </div>
+      <a routerLink="/products/new" class="ref-btn ref-btn-primary">
+        <mat-icon class="text-base w-4 h-4">add</mat-icon>
+        Add Product
+      </a>
+    </div>
+    <div class="mb-8">
+      <div class="relative inline-block max-w-[500px] gap-2 w-full">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange(searchTerm)"
+          placeholder="Search products by name or category..."
+          class="ref-input"
+        />
+        <mat-icon class="absolute right-[12px] top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]">search</mat-icon>
+      </div>
+    </div>
+    <div class="ref-card">
+      <div class="ref-card-content">
+        <div class="ref-table-container">
+          <table mat-table [dataSource]="filteredProducts" class="ref-table w-full">
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Product</th>
+              <td mat-cell *matCellDef="let product">
+                <div class="flex items-center gap-3">
+                  <div class="font-medium">{{ product.name }}</div>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="price">
+              <th mat-header-cell *matHeaderCellDef>Price</th>
+              <td mat-cell *matCellDef="let product">{{ product.price | currency:'INR':'symbol':'1.0-2' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="category">
+              <th mat-header-cell *matHeaderCellDef>Category</th>
+              <td mat-cell *matCellDef="let product">
+                <span class="ref-badge ref-badge-secondary">{{ product.category }}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="stock">
+              <th mat-header-cell *matHeaderCellDef>Stock</th>
+              <td mat-cell *matCellDef="let product">
+                <div class="flex items-center gap-2">
+                  <mat-icon *ngIf="product.stock < 20" class="text-base w-4 h-4 text-[#d97706]">warning</mat-icon>
+                  <span [class.text-[#d97706]]="product.stock < 20">{{ product.stock }}</span>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef class="text-center">Actions</th>
+              <td mat-cell *matCellDef="let product" class="text-right">
+                <div class="flex items-center justify-end gap-1">
+                  <a [routerLink]="['/products/edit', product._id]" class="ref-btn ref-btn-ghost ref-btn-icon w-8 h-8">
+                    <mat-icon class="text-[1.125rem] w-[1.125rem] h-[1.125rem]">edit</mat-icon>
+                  </a>
+                  <button class="ref-btn ref-btn-ghost ref-btn-icon w-8 h-8 text-[var(--destructive)]" (click)="deleteProduct(product._id)">
+                    <mat-icon class="text-[1.125rem] w-[1.125rem] h-[1.125rem]">delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>  
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Customer View: Product Grid -->
+  <ng-container *ngIf="!isAdmin">
+    <div class="mb-4" *ngIf="showHeader">
+      <h1>Discover Products</h1>
+      <p class="text-[var(--muted-foreground)]">Showing {{ filteredProducts.length }} products</p>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="mb-4">
+      <div class="relative inline-block max-w-[500px] gap-2 w-full">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange(searchTerm)"
+          placeholder="Search products by name or category..."
+          class="ref-input"
+        />
+        <mat-icon class="absolute right-[12px] top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]">search</mat-icon>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div *ngFor="let product of filteredProducts" class="ref-card overflow-hidden group cursor-pointer transition-all duration-200 ease-in-out flex flex-col h-full">
+        <!-- Image Area -->
+        <div class="aspect-square overflow-hidden bg-[var(--muted)] rounded-t-[var(--radius)] flex-shrink-0">
+          <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[var(--accent)] to-[var(--muted)] group-hover:scale-105 transition-transform duration-300">
+            <mat-icon class="text-[3rem] w-[3rem] h-[3rem] text-[var(--muted-foreground)] opacity-50">inventory_2</mat-icon>
+          </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="p-4 flex flex-col flex-1">
+          <!-- Title & Category -->
+          <div class="mb-auto">
+            <div class="flex justify-between items-start gap-2 mb-2">
+              <div class="flex-1 min-w-0">
+                <h3 class="line-clamp-2 text-base font-semibold text-[var(--foreground)] leading-tight mb-1 min-h-[2.5rem]">
+                  {{ product.name }}
+                </h3>
+                <span class="ref-badge ref-badge-secondary text-[10px]">{{ product.category }}</span>
+              </div>
+              <div class="text-right flex-shrink-0">
+                <span class="font-bold text-[var(--primary)] text-lg block">{{ product.price | currency:'INR':'symbol':'1.0-2' }}</span>
+              </div>
+            </div>
+
+            <!-- Stock Status -->
+            <div class="mb-4">
+              <span *ngIf="product.stock <= 0" class="text-xs font-medium text-red-500 flex items-center gap-1">
+                <mat-icon class="text-xs h-3 w-3">error_outline</mat-icon> Out of stock
+              </span>
+              <span *ngIf="product.stock > 0 && product.stock <= 5" class="text-xs font-medium text-amber-600 flex items-center gap-1">
+                <mat-icon class="text-xs h-3 w-3">history</mat-icon> Only {{ product.stock }} left
+              </span>
+              <span *ngIf="product.stock > 5" class="text-xs font-medium text-emerald-600 flex items-center gap-1">
+                <mat-icon class="text-xs h-3 w-3">check_circle_outline</mat-icon> In Stock
+              </span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <button
+            class="ref-btn ref-btn-sm w-full"
+            [class.ref-btn-primary]="product.stock > 0 && !isProductInCart(product)"
+            [class.ref-btn-outline]="product.stock <= 0 || isProductInCart(product)"
+            (click)="addToCart(product)"
+            [disabled]="product.stock <= 0 || isProductInCart(product)"
+            [ngClass]="{'opacity-50 cursor-not-allowed': product.stock <= 0 || isProductInCart(product)}"
+            [attr.aria-disabled]="product.stock <= 0 || isProductInCart(product)"
+          >
+            <mat-icon class="text-base h-4">
+              {{ product.stock <= 0 ? 'block' : (isProductInCart(product) ? 'done' : 'shopping_cart') }}
+            </mat-icon>
+            {{ product.stock <= 0 ? 'Out of Stock' : (isProductInCart(product) ? 'Added to Cart' : 'Add to Cart') }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="filteredProducts.length === 0" class="text-center py-16">
+      <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-[var(--muted)]">
+        <mat-icon class="text-[2rem] w-[2rem] h-[2rem] text-[var(--muted-foreground)]">search_off</mat-icon>
+      </div>
+      <h3>No products found</h3>
+      <p class="mt-2 text-[var(--muted-foreground)]">Try adjusting your search</p>
+    </div>
+  </ng-container>
+
+</div>

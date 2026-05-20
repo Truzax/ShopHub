@@ -1,20 +1,32 @@
-import User from '../models/User';
 import { Request, Response, NextFunction } from 'express';
+import { UserService } from '../services/userService';
+import { catchAsync } from '../middleware/catchAsync';
 
-export const getUsers = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const users = await User.find().select('-password -refreshTokens -resetPasswordToken');
-    res.json(users);
-  } catch (err) {
-    next(err);
-  }
-};
+export const getUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const result = await UserService.getUsers(req.query);
+        res.status(200).json(result);
+    } catch (error: any) {
+        next(error);
+    }
+});
 
-export const getProfile = async (req: Request & { user?: any }, res: Response, next: NextFunction) => {
-  try {
-    if (!req.user) return res.status(401).json({ message: 'Not authenticated' });
-    res.json(req.user);
-  } catch (err) {
-    next(err);
-  }
-};
+export const getProfile = catchAsync(async (req: Request & { user?: any }, res: Response, next: NextFunction) => {
+    try {
+        const result = await UserService.getProfile(req.user);
+        res.json(result);
+    } catch (error: any) {
+        if (error.status) return res.status(error.status).json({ message: error.message });
+        next(error);
+    }
+});
+
+export const updateProfile = catchAsync(async (req: Request & { user?: any }, res: Response, next: NextFunction) => {
+    try {
+        const result = await UserService.updateProfile(req.user, req.body);
+        res.status(200).json(result);
+    } catch (error: any) {
+        if (error.status) return res.status(error.status).json({ message: error.message });
+        next(error);
+    }
+});

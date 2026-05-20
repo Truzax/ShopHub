@@ -1,0 +1,59 @@
+<div class="mb-6">
+  <div class="flex items-center mb-6">
+    <div class="bg-[var(--accent)] p-2 rounded-lg text-[var(--accent-foreground)] mr-3">
+      <mat-icon>psychology</mat-icon>
+    </div>
+    <div>
+      <h2 class="text-xl font-bold text-[var(--foreground)] m-0 leading-tight">Performance Insights</h2>
+      <p class="text-sm text-[var(--muted-foreground)] m-0">AI-driven actionable recommendations</p>
+    </div>
+  </div>
+
+  <!-- Loading Skeletons -->
+  <div *ngIf="loading" class="space-y-4">
+    <div *ngFor="let i of [1,2,3]" class="bg-[var(--card)] p-4 rounded-xl border border-[var(--border)] flex items-start">
+      <div class="h-10 w-10 bg-[var(--muted)] rounded-full animate-pulse mr-4"></div>
+      <div class="flex-1">
+        <div class="h-5 w-1/4 bg-[var(--muted)] rounded animate-pulse mb-2"></div>
+        <div class="h-4 w-3/4 bg-[var(--muted)] rounded animate-pulse"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="bg-[color-mix(in_srgb,var(--destructive)_12%,transparent)] border border-[var(--destructive)] text-[var(--destructive)] p-4 rounded-xl flex items-center">
+    <mat-icon class="mr-3">error_outline</mat-icon>
+    <p class="m-0">{{ error }}</p>
+  </div>
+
+  <div *ngIf="!loading && !error && insights.length > 0" class="space-y-4 animate-fade-in">
+    <div *ngFor="let insight of insights"
+         class="ref-card p-4 flex items-start border-l-4 hover:shadow-md transition-shadow"
+         [ngClass]="getColorClassForType(insight.type)">
+
+      <div class="p-2 rounded-full mr-4 flex items-center justify-center bg-[var(--muted)]" [ngClass]="getIconColorClassForType(insight.type)">
+        <mat-icon>{{ getIconForType(insight.type) }}</mat-icon>
+      </div>
+
+      <div class="flex-1">
+        <div class="flex items-center justify-between mb-1">
+          <h3 class="font-bold text-base leading-tight m-0 text-[var(--foreground)]">{{ insight.title }}</h3>
+          <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-[var(--muted)] insight-type-badge"
+                [ngClass]="getIconColorClassForType(insight.type)">
+            {{ insight.type }}
+          </span>
+        </div>
+        <p class="text-sm text-[var(--muted-foreground)] leading-relaxed m-0">{{ insight.description }}</p>
+      </div>
+    </div>
+  </div>
+  
+  <div *ngIf="!loading && !error && insights.length === 0" class="bg-[var(--card)] p-8 rounded-xl border border-[var(--border)] text-center">
+    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--muted)] mb-4 text-[var(--muted-foreground)]">
+      <mat-icon class="text-3xl">check_circle</mat-icon>
+    </div>
+    <h3 class="text-lg font-medium text-[var(--foreground)] mb-1">Looking Good</h3>
+    <p class="text-[var(--muted-foreground)] m-0">No urgent insights or recommendations at this time.</p>
+  </div>
+
+</div>

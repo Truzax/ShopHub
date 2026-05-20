@@ -1,19 +1,26 @@
 import { Routes } from '@angular/router';
-import { DashboardComponent } from './components/dashboard/dashboard-component';
-import { UserDashboard } from './components/user-dashboard/user-dashboard';
 import { LayoutComponent } from './components/layout/layout';
 import { AuthGuard } from './services/auth.guard';
 import { AdminGuard } from './services/admin.guard';
 
 export const routes: Routes = [
-  { 
-    path: '', 
-    component: LayoutComponent, 
+  {
+    path: '',
+    component: LayoutComponent,
     canActivate: [AuthGuard],
     children: [
-      { path: 'dashboard', component: DashboardComponent, canActivate: [AdminGuard] },
-      { path: 'home', component: UserDashboard },
-      { path: '', redirectTo: 'home', pathMatch: 'full' } // AuthGuard will redirect if not authenticated, else home
+      { path: 'dashboard', loadComponent: () => import('./components/dashboard/dashboard-component').then(m => m.DashboardComponent) },
+      { path: 'orders', loadComponent: () => import('./components/user-orders/user-orders').then(m => m.UserOrdersComponent) },
+      { path: 'profile', loadComponent: () => import('./components/user-profile/user-profile').then(m => m.UserProfileComponent) },
+      { path: 'analytics', loadComponent: () => import('./components/analytics/analytics.component').then(m => m.AnalyticsComponent), canActivate: [AdminGuard] },
+      { path: 'products', loadComponent: () => import('./components/product-list/product-list').then(m => m.ProductList) },
+      { path: 'products/new', loadComponent: () => import('./components/product-form/product-form').then(m => m.ProductForm), canActivate: [AdminGuard] },
+      { path: 'products/edit/:id', loadComponent: () => import('./components/product-form/product-form').then(m => m.ProductForm), canActivate: [AdminGuard] },
+      { path: 'admin/orders', loadComponent: () => import('./components/order-list/order-list').then(m => m.OrderList), canActivate: [AdminGuard] },
+      { path: 'cart', loadComponent: () => import('./components/cart/cart').then(m => m.CartComponent) },
+      { path: 'checkout', loadComponent: () => import('./components/checkout/checkout').then(m => m.CheckoutComponent) },
+      { path: 'not-found', loadComponent: () => import('./components/not-found/not-found').then(m => m.NotFound) },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
   { path: 'signup', loadComponent: () => import('./components/signup/signup').then(m => m.Signup) },

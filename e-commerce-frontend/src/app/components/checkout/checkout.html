@@ -1,0 +1,93 @@
+<div class="p-6 md:p-8 animate-fade-in">
+  <h1 class="mb-8">Checkout</h1>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Main Content -->
+    <div class="lg:col-span-2">
+      <div class="ref-card">
+        <div class="ref-card-content space-y-6">
+          <h2>Order Review</h2>
+          <hr class="ref-separator">
+
+          <!-- Billing Info -->
+          <div>
+            <h3 class="mb-2">Customer Details</h3>
+            <div class="p-4 rounded-lg space-y-1 bg-[var(--muted)]">
+              <p *ngIf="currentUser" class="text-[var(--foreground)]">{{ currentUser.fullName || currentUser.name }}</p>
+              <p class="text-sm text-[var(--muted-foreground)]">{{ currentUser?.email }}</p>
+              <p class="text-sm text-[var(--muted-foreground)]">{{ currentUser?.phone || '' }}</p>
+            </div>
+          </div>
+
+          <!-- Order Items -->
+          <div>
+            <h3 class="mb-2">Order Items</h3>
+            <div class="space-y-2">
+              <div *ngFor="let item of cart.items" class="flex justify-between p-4 rounded-lg bg-[var(--muted)]">
+                <div class="flex gap-4">
+                  <div class="w-16 h-16 rounded overflow-hidden flex items-center justify-center bg-[var(--card)]">
+                    <mat-icon class="text-[var(--muted-foreground)]">inventory_2</mat-icon>
+                  </div>
+                  <div>
+                    <p class="text-[var(--foreground)]">{{ item.product.name }}</p>
+                    <p class="text-sm text-[var(--muted-foreground)]">Qty: {{ item.quantity }}</p>
+                  </div>
+                </div>
+                <p class="font-semibold text-[var(--foreground)]">{{ (item.product.price * item.quantity) | currency:'INR':'symbol':'1.0-2' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loading -->
+          <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-8 gap-3">
+            <mat-spinner [diameter]="40"></mat-spinner>
+            <p class="text-sm text-[var(--muted-foreground)]">Processing your order...</p>
+          </div>
+
+          <!-- Confirmation Note -->
+          <div *ngIf="!isLoading" class="p-4 rounded-lg bg-[var(--accent)]  flex items-start gap-3">
+            <mat-icon class="text-[var(--primary)] w-[1.25rem] h-[1.25rem] mt-[2px] text-[1.25rem]">info</mat-icon>
+            <p class="text-sm text-[var(--accent-foreground)]">
+              By clicking "Place Order", you agree to place this order for the amount shown.
+            </p>
+          </div>
+
+          <!-- Actions -->
+          <div *ngIf="!isLoading" class="flex gap-4">
+            <button class="ref-btn ref-btn-outline flex-1" (click)="cancelOrder()">
+              Back to Cart
+            </button>
+            <button class="ref-btn ref-btn-primary flex-1" (click)="placeOrder()" [disabled]="cart.items.length === 0 || isLoading">
+              Place Order
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Summary Sidebar -->
+    <div class="lg:col-span-1">
+      <div class="ref-card sticky top-24">
+        <div class="ref-card-content space-y-4">
+          <h3 class="font-semibold">Order Summary</h3>
+          <hr class="ref-separator">
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span class="text-[var(--muted-foreground)]">Subtotal</span>
+              <span>{{ cart.total | currency:'INR':'symbol':'1.0-2' }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-[var(--muted-foreground)]">Shipping</span>
+              <span>FREE</span>
+            </div>
+          </div>
+          <hr class="ref-separator">
+          <div class="flex justify-between font-semibold text-lg">
+            <span>Total</span>
+            <span class="text-[var(--primary)]">{{ cart.total | currency:'INR':'symbol':'1.0-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

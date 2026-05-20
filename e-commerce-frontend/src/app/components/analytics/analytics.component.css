@@ -1,0 +1,12 @@
+/* Analytics styles */
+:host {
+  display: block;
+}
+
+.stroke-muted {
+  stroke: var(--muted);
+}
+
+.stroke-primary {
+  stroke: var(--primary);
+}

@@ -1,0 +1,130 @@
+<div class="p-6 md:p-8 animate-fade-in">
+  <a routerLink="/products" class="inline-flex items-center gap-2 mb-6 text-sm hover:underline text-[var(--muted-foreground)]">
+    <mat-icon class="text-base w-4 h-4">chevron_left</mat-icon>
+    Back to Products
+  </a>
+
+  <div class="mb-8">
+    <h1>{{ isEditMode ? 'Edit Product' : 'Add New Product' }}</h1>
+    <p class="mt-1 text-[var(--muted-foreground)]">
+      {{ isEditMode ? 'Update product information' : 'Fill in the product details below' }}
+    </p>
+  </div>
+
+  <div *ngIf="errorMessage" class="p-3 mb-6 rounded-lg text-sm bg-[color-mix(in_srgb,var(--destructive)_12%,transparent)] text-[var(--destructive)] border border-[var(--destructive)]/30">
+    {{ errorMessage }}
+  </div>
+
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Main Content -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Basic Information -->
+        <div class="ref-card">
+          <div class="ref-card-header flex justify-between items-center">
+            <h3 class="ref-card-title">Basic Information</h3>
+            <button type="button" class="ref-btn text-[var(--accent-foreground)] bg-[var(--accent)] border border-[var(--border)] hover:opacity-90 flex items-center px-3 py-1 text-sm rounded-md transition-opacity" (click)="generateAiDescription()" [disabled]="isGeneratingAi">
+              <mat-spinner *ngIf="isGeneratingAi" diameter="16" class="mr-2"></mat-spinner>
+              <mat-icon *ngIf="!isGeneratingAi" class="mr-1 text-base w-4 h-4">auto_awesome</mat-icon>
+              {{ isGeneratingAi ? 'Generating...' : 'Generate AI Content' }}
+            </button>
+          </div>
+          <div *ngIf="aiError" class="mx-6 p-3 rounded-lg text-sm bg-[color-mix(in_srgb,var(--destructive)_12%,transparent)] text-[var(--destructive)] border border-[var(--destructive)]/30">
+            {{ aiError }}
+          </div>
+          <div class="ref-card-content space-y-4">
+            <div>
+              <label class="ref-label" for="pf-name">Product Name</label>
+              <mat-form-field appearance="outline" class="w-full">
+                <input matInput id="pf-name" formControlName="name" placeholder="Enter product name" />
+                <mat-error *ngIf="productForm.get('name')?.hasError('required')">Name is required</mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="ref-label" for="pf-price">Price (₹)</label>
+                <mat-form-field appearance="outline" class="w-full">
+                  <input matInput id="pf-price" type="number" formControlName="price" placeholder="0.00" />
+                  <mat-error *ngIf="productForm.get('price')?.hasError('required')">Price is required</mat-error>
+                  <mat-error *ngIf="productForm.get('price')?.hasError('min')">Price must be positive</mat-error>
+                </mat-form-field>
+              </div>
+              <div>
+                <label class="ref-label" for="pf-stock">Stock Quantity</label>
+                <mat-form-field appearance="outline" class="w-full">
+                  <input matInput id="pf-stock" type="number" formControlName="stock" placeholder="0" />
+                  <mat-error *ngIf="productForm.get('stock')?.hasError('required')">Stock is required</mat-error>
+                  <mat-error *ngIf="productForm.get('stock')?.hasError('min')">Stock must be positive</mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div>
+              <label class="ref-label" for="pf-category">Category</label>
+              <mat-form-field appearance="outline" class="w-full">
+                <input matInput id="pf-category" formControlName="category" placeholder="Product category" />
+                <mat-error *ngIf="productForm.get('category')?.hasError('required')">Category is required</mat-error>
+              </mat-form-field>
+            </div>
+            
+            <!-- AI Generated Content Fields -->
+            <div class="border-t border-[var(--border)] pt-4 mt-2">
+              <h4 class="text-sm font-semibold text-[var(--foreground)] mb-3 flex items-center">
+                <mat-icon class="mr-1 text-[var(--primary)] text-[18px] w-[18px] h-[18px]">description</mat-icon>
+                Detailed Information
+              </h4>
+              
+              <div>
+                <label class="ref-label" for="pf-short-desc">Short Description</label>
+                <mat-form-field appearance="outline" class="w-full">
+                  <textarea matInput id="pf-short-desc" formControlName="shortDescription" placeholder="A catchy summary" rows="2"></textarea>
+                </mat-form-field>
+              </div>
+
+              <div>
+                <label class="ref-label" for="pf-long-desc">Long Description</label>
+                <mat-form-field appearance="outline" class="w-full">
+                  <textarea matInput id="pf-long-desc" formControlName="longDescription" placeholder="Detailed marketing copy" rows="4"></textarea>
+                </mat-form-field>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="ref-label" for="pf-features">Features (One per line)</label>
+                  <mat-form-field appearance="outline" class="w-full">
+                    <textarea matInput id="pf-features" formControlName="features" placeholder="e.g. Lightweight design&#10;Water resistant" rows="3"></textarea>
+                  </mat-form-field>
+                </div>
+                <div>
+                  <label class="ref-label" for="pf-seo">SEO Keywords (Comma separated)</label>
+                  <mat-form-field appearance="outline" class="w-full">
+                    <textarea matInput id="pf-seo" formControlName="seoKeywords" placeholder="e.g. best laptop, gaming laptop, affordable" rows="3"></textarea>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="space-y-6">
+        <div class="ref-card">
+          <div class="ref-card-header">
+            <h3 class="ref-card-title">Publishing</h3>
+          </div>
+          <div class="ref-card-content space-y-3">
+            <button type="submit" [disabled]="productForm.invalid" class="ref-btn ref-btn-primary w-full ref-btn-lg">
+              {{ isEditMode ? 'Update Product' : 'Create Product' }}
+            </button>
+            <a routerLink="/products" class="ref-btn ref-btn-outline w-full text-center no-underline">
+              Cancel
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

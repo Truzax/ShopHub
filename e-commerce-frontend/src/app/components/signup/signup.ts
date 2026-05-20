@@ -78,13 +78,9 @@ export class Signup {
     if (this.signupForm.invalid) return;
     const { name, email, password } = this.signupForm.value as { name: string; email: string; password: string };
     this.auth.signup({ name, email, password }).subscribe({
-      next: () => {
-        const user = this.auth.getUser();
-        if (user?.role === 'admin') {
-          this.router.navigate(['/dashboard']);
-        } else {
-          this.router.navigate(['/home']);
-        }
+      next: (res) => {
+        const user = res.user;
+        this.router.navigate(['/dashboard']);
       },
       error: (err) => (this.error = err?.error?.message || 'Signup failed'),
     });

@@ -1,16 +1,34 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+const requiredEnv = ['JWT_SECRET', 'MONGO_URI'];
+for (const env of requiredEnv) {
+  if (!process.env[env]) {
+    console.error(`FATAL ERROR: ${env} is not defined in environment variables.`);
+    process.exit(1);
+  }
+}
+
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import compression from 'compression';
 
 import connectDB from './config/db';
 import usersRoute from './routes/users';
 import authRoute from './routes/auth';
-import errorHandler from './middleware/errorHandler';
+import productsRoute from './routes/products';
+import ordersRoute from './routes/orders';
+import analyticsRoute from './routes/analytics';
+import cartRoute from './routes/cart';
+import aiRoute from './routes/ai';
+import errorHandler from './utils/errorHandler';
+import { globalLimiter } from './middleware/rateLimit';
 
 const app = express();
+app.use(helmet());
+app.use(compression());
 app.use(express.json());
 app.use(cors({ origin: process.env.FRONTEND_ORIGIN || 'http://localhost:4200', credentials: true }));
 app.use(cookieParser());
@@ -24,8 +42,14 @@ connectDB().catch((err) => console.error('DB connection error:', err));
 app.get('/', (req, res) => res.send('Server is running'));
 
 // API routes
+app.use('/api', globalLimiter);
 app.use('/api/users', usersRoute);
 app.use('/api/auth', authRoute);
+app.use('/api/products', productsRoute);
+app.use('/api/orders', ordersRoute);
+app.use('/api/dashboard', analyticsRoute);
+app.use('/api/cart', cartRoute);
+app.use('/api/ai', aiRoute);
 
 // Error handler
 app.use(errorHandler);

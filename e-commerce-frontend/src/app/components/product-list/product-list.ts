@@ -1,0 +1,146 @@
+import { Component, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef, DestroyRef, inject, Input } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatInputModule } from '@angular/material/input';
+import { ProductService } from '../../services/product.service';
+import { CartService } from '../../services/cart.service';
+import { Product } from '../../models/product.model';
+import { AuthService } from '../../services/auth';
+
+@Component({
+  selector: 'app-product-list',
+  standalone: true,
+  imports: [CommonModule, RouterModule, FormsModule, MatTableModule, MatButtonModule, MatIconModule, MatSnackBarModule, MatInputModule],
+  templateUrl: './product-list.html',
+  styleUrls: ['./product-list.css']
+})
+export class ProductList implements OnInit, OnChanges {
+  @Input() showHeader = true;
+  @Input() categoryFilter = '';
+  @Input() sortOption = '';
+  allProducts: Product[] = [];
+  filteredProducts: Product[] = [];
+  displayedColumns: string[] = ['name', 'price', 'category', 'stock', 'quantity', 'cartActions'];
+  isAdmin = false;
+  quantities: { [key: string]: number } = {};
+  searchTerm: string = '';
+  cartProductIds: Set<string> = new Set();
+  private destroyRef = inject(DestroyRef);
+
+  constructor(
+    private productService: ProductService,
+    private cartService: CartService,
+    private cdr: ChangeDetectorRef,
+    private auth: AuthService,
+    private snackBar: MatSnackBar
+  ) {}
+
+  ngOnInit() {
+    const user = this.auth.getUserValue();
+    this.isAdmin = user?.role === 'admin';
+    if (this.isAdmin) {
+      this.displayedColumns = ['name', 'price', 'category', 'stock', 'actions'];
+    }
+    
+    // Track items in cart for UI state
+    this.cartService.cart$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(cart => {
+      this.cartProductIds = new Set(cart.items.map(item => (item.product as any)._id));
+      this.cdr.detectChanges();
+    });
+
+    this.loadProducts();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['categoryFilter'] || changes['sortOption']) {
+      this.applySearchFilter();
+    }
+  }
+
+  isProductInCart(product: Product): boolean {
+    return !!product._id && this.cartProductIds.has(product._id);
+  }
+
+  loadProducts() {
+    this.productService.getProducts(1, 1000).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(res => {
+      this.allProducts = res.data ? [...res.data] : [];
+      this.applySearchFilter();
+
+      this.allProducts.forEach(product => {
+        const productId = (product as any)._id;
+        if (!this.quantities[productId]) {
+          this.quantities[productId] = 1;
+        }
+      });
+
+      this.cdr.detectChanges();
+    });
+  }
+
+  onSearchChange(searchValue: string) {
+    this.searchTerm = searchValue;
+    this.applySearchFilter();
+  }
+
+  private applySearchFilter() {
+    const normalizedSearchTerm = this.searchTerm.trim().toLowerCase();
+    const normalizedCategory = this.categoryFilter.trim().toLowerCase();
+
+    let result = this.allProducts.filter(product => {
+      const matchesSearch = !normalizedSearchTerm || 
+        product.name.toLowerCase().includes(normalizedSearchTerm) ||
+        product.category.toLowerCase().includes(normalizedSearchTerm);
+      
+      const matchesCategory = !normalizedCategory || 
+        product.category.toLowerCase() === normalizedCategory;
+
+      return matchesSearch && matchesCategory;
+    });
+
+    if (this.sortOption === 'price_asc') {
+      result.sort((a, b) => a.price - b.price);
+    } else if (this.sortOption === 'price_desc') {
+      result.sort((a, b) => b.price - a.price);
+    }
+
+    this.filteredProducts = result;
+  }
+
+  addToCart(product: Product) {
+    const productId = (product as any)._id;
+    const quantity = this.quantities[productId] || 1;
+
+    if (quantity <= 0) {
+      this.snackBar.open('Quantity must be at least 1', 'Close', { duration: 3000 });
+      return;
+    }
+
+    const result = this.cartService.addToCart(product, quantity);
+    this.snackBar.open(
+      result.message || `${product.name} added to cart!`,
+      'Close',
+      { duration: 2000 }
+    );
+
+    // Reset quantity to 1 after adding
+    this.quantities[productId] = 1;
+  }
+
+  deleteProduct(id: string) {
+    if(confirm('Are you sure you want to delete this product?')) {
+      this.productService.deleteProduct(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+        this.loadProducts();
+      });
+    }
+  }
+
+  getProductId(product: Product): string {
+    return (product as any)._id;
+  }
+}
