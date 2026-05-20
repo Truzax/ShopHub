@@ -1,13 +1,32 @@
 import { Request, Response, NextFunction } from 'express';
 
 export default (err: any, req: Request, res: Response, next: NextFunction) => {
+  let error = { ...err };
+  error.message = err.message;
+
   console.error(err);
 
-  const statusCode = err.statusCode || 500;
+  // Mongoose bad ObjectId
+  if (err.name === 'CastError') {
+    const message = `Resource not found`;
+    error = { statusCode: 404, message };
+  }
+
+  // Mongoose duplicate key
+  if (err.code === 11000) {
+    const message = 'Duplicate field value entered';
+    error = { statusCode: 400, message };
+  }
+
+  // Mongoose validation error
+  if (err.name === 'ValidationError') {
+    const message = Object.values(err.errors).map((val: any) => val.message).join(', ');
+    error = { statusCode: 400, message };
+  }
+
+  const statusCode = error.statusCode || 500;
   
-  // Don't leak stack traces or internal DB schema errors to the client except in dev mode
-  let message = err.message || 'Server Error';
-  
+  let message = error.message || 'Server Error';
   if (process.env.NODE_ENV === 'production' && statusCode === 500) {
       message = 'Internal Server Error';
   }

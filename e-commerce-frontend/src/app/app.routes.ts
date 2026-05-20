@@ -1,7 +1,4 @@
 import { Routes } from '@angular/router';
-import { DashboardComponent } from './components/dashboard/dashboard-component';
-import { UserOrdersComponent } from './components/user-orders/user-orders';
-import { UserProfileComponent } from './components/user-profile/user-profile';
 import { LayoutComponent } from './components/layout/layout';
 import { AuthGuard } from './services/auth.guard';
 import { AdminGuard } from './services/admin.guard';
@@ -12,9 +9,9 @@ export const routes: Routes = [
     component: LayoutComponent,
     canActivate: [AuthGuard],
     children: [
-      { path: 'dashboard', component: DashboardComponent },
-      { path: 'orders', component: UserOrdersComponent },
-      { path: 'profile', component: UserProfileComponent },
+      { path: 'dashboard', loadComponent: () => import('./components/dashboard/dashboard-component').then(m => m.DashboardComponent) },
+      { path: 'orders', loadComponent: () => import('./components/user-orders/user-orders').then(m => m.UserOrdersComponent) },
+      { path: 'profile', loadComponent: () => import('./components/user-profile/user-profile').then(m => m.UserProfileComponent) },
       { path: 'analytics', loadComponent: () => import('./components/analytics/analytics.component').then(m => m.AnalyticsComponent), canActivate: [AdminGuard] },
       { path: 'products', loadComponent: () => import('./components/product-list/product-list').then(m => m.ProductList) },
       { path: 'products/new', loadComponent: () => import('./components/product-form/product-form').then(m => m.ProductForm), canActivate: [AdminGuard] },

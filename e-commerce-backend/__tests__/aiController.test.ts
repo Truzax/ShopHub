@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { getSalesSummary, getPerformanceInsights, generateProductDescription, handleChat } from '../controllers/aiController';
 import Order from '../models/Order';
 import Product from '../models/Product';
@@ -15,6 +15,7 @@ jest.mock('../services/aiService');
 describe('AI Controller', () => {
   let mockReq: Partial<Request>;
   let mockRes: Partial<Response>;
+  let mockNext: jest.Mock;
 
   beforeEach(() => {
     mockReq = {
@@ -26,6 +27,7 @@ describe('AI Controller', () => {
       status: jest.fn().mockReturnThis(),
       json: jest.fn()
     };
+    mockNext = jest.fn();
     jest.clearAllMocks();
   });
 
@@ -42,7 +44,7 @@ describe('AI Controller', () => {
       });
       (AiCache.findOne as jest.Mock).mockResolvedValue(mockCached);
 
-      await getSalesSummary(mockReq as Request, mockRes as Response);
+      await getSalesSummary(mockReq as Request, mockRes as Response, mockNext);
       
       expect(mockRes.status).toHaveBeenCalledWith(200);
       expect(mockRes.json).toHaveBeenCalledWith({ success: true, summary: 'Cached Summary' });
@@ -67,7 +69,7 @@ describe('AI Controller', () => {
       (AiService.generateSalesSummary as jest.Mock).mockResolvedValue('New Summary');
       (AiCache.findOneAndUpdate as jest.Mock).mockResolvedValue({});
 
-      await getSalesSummary(mockReq as Request, mockRes as Response);
+      await getSalesSummary(mockReq as Request, mockRes as Response, mockNext);
       
       expect(AiService.generateSalesSummary).toHaveBeenCalled();
       expect(mockRes.status).toHaveBeenCalledWith(200);
@@ -77,8 +79,8 @@ describe('AI Controller', () => {
     it('should handle errors', async () => {
       const error = new Error('DB error');
       (Order.find as jest.Mock).mockImplementation(() => { throw error; });
-      await getSalesSummary(mockReq as Request, mockRes as Response);
-      expect(mockRes.status).toHaveBeenCalledWith(500);
+      await getSalesSummary(mockReq as Request, mockRes as Response, mockNext);
+      expect(mockNext).toHaveBeenCalledWith(error);
     });
   });
 
@@ -97,7 +99,7 @@ describe('AI Controller', () => {
       });
       (AiCache.findOne as jest.Mock).mockResolvedValue(mockCached);
 
-      await getPerformanceInsights(mockReq as Request, mockRes as Response);
+      await getPerformanceInsights(mockReq as Request, mockRes as Response, mockNext);
       
       expect(mockRes.status).toHaveBeenCalledWith(200);
       expect(mockRes.json).toHaveBeenCalledWith({ success: true, insights: 'Cached Insights' });
@@ -116,7 +118,7 @@ describe('AI Controller', () => {
       (AiCache.findOne as jest.Mock).mockResolvedValue(null);
       (AiService.generatePerformanceInsights as jest.Mock).mockResolvedValue('New Insights');
       
-      await getPerformanceInsights(mockReq as Request, mockRes as Response);
+      await getPerformanceInsights(mockReq as Request, mockRes as Response, mockNext);
       
       expect(AiService.generatePerformanceInsights).toHaveBeenCalled();
       expect(mockRes.status).toHaveBeenCalledWith(200);
@@ -126,22 +128,22 @@ describe('AI Controller', () => {
     it('should handle errors', async () => {
       const error = new Error('DB error');
       (Product.find as jest.Mock).mockImplementation(() => { throw error; });
-      await getPerformanceInsights(mockReq as Request, mockRes as Response);
-      expect(mockRes.status).toHaveBeenCalledWith(500);
+      await getPerformanceInsights(mockReq as Request, mockRes as Response, mockNext);
+      expect(mockNext).toHaveBeenCalledWith(error);
     });
   });
 
   describe('generateProductDescription', () => {
     it('should return 400 if name or category missing', async () => {
       mockReq.body = { name: 'Test' };
-      await generateProductDescription(mockReq as Request, mockRes as Response);
+      await generateProductDescription(mockReq as Request, mockRes as Response, mockNext);
       expect(mockRes.status).toHaveBeenCalledWith(400);
     });
 
     it('should generate description successfully', async () => {
       mockReq.body = { name: 'Test', category: 'Electronics' };
       (AiService.generateProductDescription as jest.Mock).mockResolvedValue('Description');
-      await generateProductDescription(mockReq as Request, mockRes as Response);
+      await generateProductDescription(mockReq as Request, mockRes as Response, mockNext);
       expect(mockRes.status).toHaveBeenCalledWith(200);
       expect(mockRes.json).toHaveBeenCalledWith({ success: true, generatedData: 'Description' });
     });
@@ -150,14 +152,14 @@ describe('AI Controller', () => {
       mockReq.body = { name: 'Test', category: 'Electronics' };
       const error = new Error('Error');
       (AiService.generateProductDescription as jest.Mock).mockRejectedValue(error);
-      await generateProductDescription(mockReq as Request, mockRes as Response);
-      expect(mockRes.status).toHaveBeenCalledWith(500);
+      await generateProductDescription(mockReq as Request, mockRes as Response, mockNext);
+      expect(mockNext).toHaveBeenCalledWith(error);
     });
   });
 
   describe('handleChat', () => {
     it('should return 400 if message is missing', async () => {
-      await handleChat(mockReq as Request, mockRes as Response);
+      await handleChat(mockReq as Request, mockRes as Response, mockNext);
       expect(mockRes.status).toHaveBeenCalledWith(400);
     });
 
@@ -177,7 +179,7 @@ describe('AI Controller', () => {
       
       (AiService.handleChat as jest.Mock).mockResolvedValue('Admin AI Reply');
 
-      await handleChat(mockReq as Request, mockRes as Response);
+      await handleChat(mockReq as Request, mockRes as Response, mockNext);
       
       expect(mockRes.status).toHaveBeenCalledWith(200);
       expect(mockRes.json).toHaveBeenCalledWith({ success: true, response: 'Admin AI Reply' });
@@ -198,7 +200,7 @@ describe('AI Controller', () => {
       
       (AiService.handleChat as jest.Mock).mockResolvedValue('Customer AI Reply');
 
-      await handleChat(mockReq as Request, mockRes as Response);
+      await handleChat(mockReq as Request, mockRes as Response, mockNext);
       
       expect(mockConversation.save).toHaveBeenCalled();
       expect(mockConversation.messages.length).toBe(10); // Trimmed to last 10
@@ -210,8 +212,8 @@ describe('AI Controller', () => {
       mockReq.body = { message: 'Hello' };
       const error = new Error('DB Error');
       (AiConversation.findOne as jest.Mock).mockRejectedValue(error);
-      await handleChat(mockReq as Request, mockRes as Response);
-      expect(mockRes.status).toHaveBeenCalledWith(500);
+      await handleChat(mockReq as Request, mockRes as Response, mockNext);
+      expect(mockNext).toHaveBeenCalledWith(error);
     });
   });
 });
