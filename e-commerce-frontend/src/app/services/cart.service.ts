@@ -23,9 +23,16 @@ export class CartService implements OnDestroy {
   }
 
   private initCartSync(): void {
+    let previousUser: any = null;
+    
     // When user changes (login/logout)
     this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
       if (user) {
+        if (previousUser && previousUser.id !== user.id) {
+          // Changed from one authenticated user to another without explicit logout
+          this.cartSubject.next({ items: [], total: 0 });
+          localStorage.removeItem('cart');
+        }
         // User just logged in, sync guest cart to server
         this.mergeAndSyncWithServer();
       } else {
@@ -33,6 +40,7 @@ export class CartService implements OnDestroy {
         this.cartSubject.next({ items: [], total: 0 });
         localStorage.removeItem('cart');
       }
+      previousUser = user;
     });
   }
 

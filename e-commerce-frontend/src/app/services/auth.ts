@@ -54,6 +54,7 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.baseAuth}/login`, { email, password }, { withCredentials: true }).pipe(
       tap((res) => {
         if (res && res.token) {
+            localStorage.removeItem('cart'); // Clear any previous user's cart
             localStorage.setItem('access_token', res.token);
             this.currentUserSubject.next(res.user);
         }
@@ -65,6 +66,7 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.baseAuth}/signup`, payload, { withCredentials: true }).pipe(
       tap((res) => {
         if (res && res.token) {
+            localStorage.removeItem('cart'); // Clear any previous user's cart
             localStorage.setItem('access_token', res.token);
             this.currentUserSubject.next(res.user);
         }
@@ -106,6 +108,7 @@ export class AuthService {
 
   private logoutLocally() {
       localStorage.removeItem('access_token');
+      localStorage.removeItem('cart'); // Ensure cart doesn't leak to a new user
       this.currentUserSubject.next(null);
       this.router.navigate(['/login']);
   }
