@@ -187,7 +187,7 @@ describe('AI Controller', () => {
 
     it('should process chat and return response for customer, trimming old messages', async () => {
       mockReq.body = { message: 'Hello' };
-      mockReq.user = { id: 'user123', role: 'customer' } as any;
+      (mockReq as any).user = { id: 'user123', role: 'customer' };
 
       const mockConversation = {
         userId: 'user123',

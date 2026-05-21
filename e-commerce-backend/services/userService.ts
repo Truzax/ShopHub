@@ -37,14 +37,14 @@ export class UserService {
     if (!foundUser) throw { status: 404, message: 'User not found' };
 
     if (name) foundUser.name = name;
-    if (phone) foundUser.phone = phone;
-    if (address) foundUser.address = address;
+    if (phone) (foundUser as any).phone = phone;
+    if (address) (foundUser as any).address = address;
 
     await foundUser.save();
 
     const updatedUser = foundUser.toObject();
-    delete updatedUser.password;
-    delete updatedUser.refreshTokens;
+    delete (updatedUser as any).password;
+    delete (updatedUser as any).refreshTokens;
     delete (updatedUser as any).resetPasswordToken;
 
     return {
