@@ -24,7 +24,7 @@ export const getCategories = catchAsync(async (req: Request, res: Response, next
 
 export const getProductById = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const product = await ProductService.getProductById(req.params.id);
+        const product = await ProductService.getProductById(req.params.id!);
         res.status(200).json(product);
     } catch (error: any) {
         if (error.status) return res.status(error.status).json({ message: error.message });
@@ -54,7 +54,7 @@ export const createBulkProducts = catchAsync(async (req: Request, res: Response,
 
 export const updateProduct = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const updatedProduct = await ProductService.updateProduct(req.params.id, req.body);
+        const updatedProduct = await ProductService.updateProduct(req.params.id!, req.body);
         res.status(200).json(updatedProduct);
     } catch (error: any) {
         if (error.status) return res.status(error.status).json({ message: error.message });
@@ -64,7 +64,7 @@ export const updateProduct = catchAsync(async (req: Request, res: Response, next
 
 export const deleteProduct = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const result = await ProductService.deleteProduct(req.params.id);
+        const result = await ProductService.deleteProduct(req.params.id!);
         res.status(200).json(result);
     } catch (error: any) {
         if (error.status) return res.status(error.status).json({ message: error.message });

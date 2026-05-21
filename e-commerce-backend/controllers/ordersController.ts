@@ -24,7 +24,7 @@ export const getOrders = catchAsync(async (req: Request & { user?: any }, res: R
 
 export const getOrderById = catchAsync(async (req: Request & { user?: any }, res: Response, next: NextFunction) => {
     try {
-        const order = await OrderService.getOrderById(req.user, req.params.id);
+        const order = await OrderService.getOrderById(req.user, req.params.id!);
         res.status(200).json(order);
     } catch (error: any) {
         if (error.status) return res.status(error.status).json({ message: error.message });
@@ -34,7 +34,7 @@ export const getOrderById = catchAsync(async (req: Request & { user?: any }, res
 
 export const updateOrderStatus = catchAsync(async (req: Request & { user?: any }, res: Response, next: NextFunction) => {
     try {
-        const order = await OrderService.updateOrderStatus(req.params.id, req.body.status);
+        const order = await OrderService.updateOrderStatus(req.params.id!, req.body.status);
         res.status(200).json(order);
     } catch (error: any) {
         if (error.status) return res.status(error.status).json({ message: error.message });

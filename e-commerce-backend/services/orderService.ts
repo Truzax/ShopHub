@@ -118,7 +118,7 @@ export class OrderService {
       order.stockUpdated = true;
     }
 
-    order.status = status;
+    order.status = status as 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
     await order.save();
 
     return order;

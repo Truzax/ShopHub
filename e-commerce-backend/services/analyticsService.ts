@@ -299,7 +299,7 @@ export class AnalyticsService {
     const categoryDistribution = Array.from(categoryTotals.entries()).map(([name, value], index) => ({
       name,
       value,
-      color: colorMap[name] || defaultColors[index % defaultColors.length],
+      color: colorMap[name] || defaultColors[index % defaultColors.length] || '#cccccc',
     }));
 
     return {
