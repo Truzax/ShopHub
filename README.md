@@ -69,24 +69,6 @@ E-Commerce-Analytics-Dashboard/
 
 ---
 
-## 📸 Screenshots / Demo
-
-<div align="center">
-
-*Add placeholders for your application screenshots here*
-
-| Homepage / Login | Main Dashboard |
-| :---: | :---: |
-| <img src="https://via.placeholder.com/400x250.png?text=Login+Screen" alt="Login" /> | <img src="https://via.placeholder.com/400x250.png?text=Dashboard+Analytics" alt="Dashboard" /> |
-
-| Mobile View | Admin Panel |
-| :---: | :---: |
-| <img src="https://via.placeholder.com/400x250.png?text=Mobile+Responsive" alt="Mobile" /> | <img src="https://via.placeholder.com/400x250.png?text=Admin+Management" alt="Admin" /> |
-
-</div>
-
----
-
 ## 🚀 Installation Guide
 
 Follow these steps to get the project running on your local machine.
@@ -303,58 +285,6 @@ The Express server utilizes a layered architecture:
 
 ---
 
-## 🐳 Docker Setup (Optional)
-
-Containerize the application for easy distribution.
-
-### `Dockerfile` (Backend Example)
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm install --production
-COPY . .
-EXPOSE 5000
-CMD ["npm", "start"]
-```
-
-### `docker-compose.yml`
-
-```yaml
-version: '3.8'
-services:
-  backend:
-    build: ./e-commerce-backend
-    ports:
-      - "5000:5000"
-    environment:
-      - MONGO_URI=mongodb://mongo:27017/ecommerce
-      - JWT_SECRET=docker_secret
-    depends_on:
-      - mongo
-
-  frontend:
-    build: ./e-commerce-frontend
-    ports:
-      - "4200:80"
-    depends_on:
-      - backend
-
-  mongo:
-    image: mongo:6.0
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-
-volumes:
-  mongo_data:
-```
-
-*Run `docker-compose up -d --build` to start the entire stack.*
-
----
-
 ## 🧪 Testing
 
 We believe in robust code quality.
@@ -384,49 +314,6 @@ We believe in robust code quality.
 - **Compression:** Node server utilizes the `compression` middleware to gzip API responses, significantly reducing payload sizes.
 - **MongoDB Indexing:** Critical fields (e.g., `email`, `createdAt`, `status`) are indexed for fast read operations and efficient aggregation queries.
 - **Caching (Future):** Redis implementation planned for caching heavy analytics data.
-
----
-
-## 🔄 CI/CD Pipeline
-
-Automated workflows ensure code quality before merging.
-
-### `.github/workflows/main.yml`
-
-```yaml
-name: MEAN Stack CI
-
-on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main, develop ]
-
-jobs:
-  test-backend:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18.x'
-      - run: cd e-commerce-backend && npm ci
-      - run: cd e-commerce-backend && npm run lint
-      - run: cd e-commerce-backend && npm test
-
-  test-frontend:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18.x'
-      - run: cd e-commerce-frontend && npm ci
-      - run: cd e-commerce-frontend && npm run lint
-      - run: cd e-commerce-frontend && npm test -- --watch=false --browsers=ChromeHeadless
-```
 
 ---
 
@@ -473,10 +360,10 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 📬 Contact
 
-**Project Maintainer:** [Your Name / Company]
+**Project Maintainer:** [Akshay Shukla]
 
-- 📧 Email: your.email@example.com
-- 💼 LinkedIn: [linkedin.com/in/yourusername](https://linkedin.com)
-- 🐙 GitHub: [github.com/yourusername](https://github.com)
+- 📧 Email: [akshaysbuilds@gmail.com]
+- 💼 LinkedIn: [linkedin.com/in/akshaysshukla](https://www.linkedin.com/in/akshaysshukla/)
+- 🐙 GitHub: [github.com/AkshayS734](https://github.com/AkshayS734)
 
 <p align="right"><a href="#top">⬆️ Back to Top</a></p>
