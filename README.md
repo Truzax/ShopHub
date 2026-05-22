@@ -360,9 +360,9 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 📬 Contact
 
-**Project Maintainer:** [Akshay Shukla]
+**Project Maintainer:** Akshay Shukla
 
-- 📧 Email: [akshaysbuilds@gmail.com]
+- 📧 Email: akshaysbuilds@gmail.com
 - 💼 LinkedIn: [linkedin.com/in/akshaysshukla](https://www.linkedin.com/in/akshaysshukla/)
 - 🐙 GitHub: [github.com/AkshayS734](https://github.com/AkshayS734)
 
