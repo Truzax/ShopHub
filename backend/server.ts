@@ -14,7 +14,6 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import compression from 'compression';
-
 import connectDB from './config/db';
 import usersRoute from './routes/users';
 import authRoute from './routes/auth';
@@ -27,9 +26,10 @@ import errorHandler from './utils/errorHandler';
 import { globalLimiter } from './middleware/rateLimit';
 
 const app = express();
+app.set('trust proxy', 1);
 app.use(helmet());
 app.use(compression());
-app.use(express.json());
+app.use(express.json({ limit: '10kb' }));
 app.use(cors({ origin: process.env.FRONTEND_ORIGIN || 'http://localhost:4200', credentials: true }));
 app.use(cookieParser());
 
