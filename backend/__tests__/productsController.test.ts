@@ -1,6 +1,7 @@
 import { getProducts, getCategories, getProductById, createProduct, createBulkProducts, updateProduct, deleteProduct } from '../controllers/productsController';
 import Product from '../models/Product';
 import { Request, Response, NextFunction } from 'express';
+import mongoose from 'mongoose';
 
 jest.mock('../models/Product');
 
@@ -30,7 +31,7 @@ describe('ProductsController', () => {
 
             await getProducts(mockRequest as Request, mockResponse as Response, nextFunction);
 
-            expect(Product.find).toHaveBeenCalledWith({ _id: { $in: ['1', '2', '3'] } });
+            expect(Product.find).toHaveBeenCalledWith({ _id: mongoose.trusted({ $in: ['1', '2', '3'] }) });
             expect(mockResponse.status).toHaveBeenCalledWith(200);
             expect(mockResponse.json).toHaveBeenCalledWith({
                 success: true,
