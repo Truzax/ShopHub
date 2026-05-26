@@ -2,6 +2,7 @@ import User from '../models/User';
 import jwt, { Secret } from 'jsonwebtoken';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
+import mongoose from 'mongoose';
 
 const ACCESS_TOKEN_EXPIRES = process.env.JWT_EXPIRES_IN || '15m';
 
@@ -152,7 +153,7 @@ export class AuthService {
   static async resetPassword(data: any) {
     const { token, email, password } = data;
     const hashed = crypto.createHash('sha256').update(token).digest('hex');
-    const user = await User.findOne({ email, resetPasswordToken: hashed, resetPasswordExpires: { $gt: Date.now() } });
+    const user = await User.findOne({ email, resetPasswordToken: hashed, resetPasswordExpires: mongoose.trusted({ $gt: Date.now() }) });
     if (!user) {
       throw { status: 400, message: 'Invalid or expired token' };
     }
@@ -171,7 +172,7 @@ export class AuthService {
 
   static async validateReset(token: string, email: string) {
     const hashed = crypto.createHash('sha256').update(token).digest('hex');
-    const user = await User.findOne({ email, resetPasswordToken: hashed, resetPasswordExpires: { $gt: Date.now() } });
+    const user = await User.findOne({ email, resetPasswordToken: hashed, resetPasswordExpires: mongoose.trusted({ $gt: Date.now() }) });
     return !!user;
   }
 }

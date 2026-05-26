@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import mongoose from 'mongoose';
 import { AiService } from '../services/aiService';
 import Order from '../models/Order';
 import Product from '../models/Product';
@@ -12,16 +13,16 @@ export const getSalesSummary = catchAsync(async (req: Request, res: Response, ne
     let dateFilter: any = {};
     if (startDate && endDate) {
         dateFilter = {
-            date: {
+            date: mongoose.trusted({
                 $gte: new Date(startDate as string),
                 $lte: new Date(endDate as string)
-            }
+            })
         };
     }
 
     const orders = await Order.find({
         ...dateFilter,
-        status: { $in: ['processing', 'shipped', 'delivered'] }
+        status: mongoose.trusted({ $in: ['processing', 'shipped', 'delivered'] })
     }).populate('products.product', 'name category price').limit(500).lean();
 
     let ordersData = orders;
@@ -66,7 +67,7 @@ export const getSalesSummary = catchAsync(async (req: Request, res: Response, ne
 
 export const getPerformanceInsights = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const products = await Product.find().select('name category price stock').lean();
-    const recentOrders = await Order.find({ status: { $ne: 'cancelled' } })
+    const recentOrders = await Order.find({ status: mongoose.trusted({ $ne: 'cancelled' }) })
         .sort({ date: -1 })
         .limit(100)
         .populate('products.product', 'name category')
@@ -155,8 +156,8 @@ export const handleChat = catchAsync(async (req: Request & { user?: any }, res: 
     let contextData: any = {};
 
     if (role === 'admin') {
-        const lowStockProducts = await Product.find({ stock: { $lt: 10 } }).select('name stock category').lean();
-        const recentOrders = await Order.find({ status: { $ne: 'cancelled' } })
+        const lowStockProducts = await Product.find({ stock: mongoose.trusted({ $lt: 10 }) }).select('name stock category').lean();
+        const recentOrders = await Order.find({ status: mongoose.trusted({ $ne: 'cancelled' }) })
             .sort({ date: -1 })
             .limit(50)
             .select('total status date')
@@ -168,7 +169,7 @@ export const handleChat = catchAsync(async (req: Request & { user?: any }, res: 
             recentOrders
         };
     } else {
-        const products = await Product.find({ stock: { $gt: 0 } }).select('name price category description.short').limit(30).lean();
+        const products = await Product.find({ stock: mongoose.trusted({ $gt: 0 }) }).select('name price category description.short').limit(30).lean();
         
         contextData = {
             role: 'customer',

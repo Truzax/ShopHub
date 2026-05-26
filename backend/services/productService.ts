@@ -1,10 +1,11 @@
 import Product from '../models/Product';
+import mongoose from 'mongoose';
 
 export class ProductService {
   static async getProducts(query: any) {
     if (query.ids) {
       const ids = (query.ids as string).split(',');
-      const products = await Product.find({ _id: { $in: ids } });
+      const products = await Product.find({ _id: mongoose.trusted({ $in: ids }) });
       return { success: true, count: products.length, data: products };
     }
 
