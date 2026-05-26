@@ -5,6 +5,9 @@ const connectDB = async (): Promise<void> => {
   if (!MONGO_URI) {
     throw new Error('MONGO_URI not defined in environment');
   }
+  // Enable global sanitization for query filters to prevent NoSQL injection
+  mongoose.set('sanitizeFilter', true);
+  
   await mongoose.connect(MONGO_URI);
   console.log('Mongodb connected!');
 };

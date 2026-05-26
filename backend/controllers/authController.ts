@@ -15,7 +15,7 @@ function cookieOptions(): CookieOptions {
 }
 
 export const signup = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const { name, email, password, role } = req.body as any;
+  const { name, email, password, role } = req.body as { name?: string; email?: string; password?: string; role?: string };
   if (!name || !email || !password) return res.status(400).json({ message: 'Missing fields' });
 
   try {
@@ -34,7 +34,7 @@ export const signup = catchAsync(async (req: Request, res: Response, next: NextF
 });
 
 export const login = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const { email, password } = req.body as any;
+  const { email, password } = req.body as { email?: string; password?: string };
   if (!email || !password) return res.status(400).json({ message: 'Missing fields' });
 
   try {
@@ -50,7 +50,7 @@ export const login = catchAsync(async (req: Request, res: Response, next: NextFu
 });
 
 export const refresh = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const token = (req as any).cookies && (req as any).cookies.refreshToken;
+  const token = req.cookies && req.cookies.refreshToken;
   if (!token) return res.status(401).json({ message: 'No refresh token provided' });
 
   try {
@@ -66,7 +66,7 @@ export const refresh = catchAsync(async (req: Request, res: Response, next: Next
 });
 
 export const logout = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const token = (req as any).cookies && (req as any).cookies.refreshToken;
+  const token = req.cookies && req.cookies.refreshToken;
   if (token) {
     await AuthService.logout(token);
   }
@@ -75,7 +75,7 @@ export const logout = catchAsync(async (req: Request, res: Response, next: NextF
 });
 
 export const forgotPassword = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const { email } = req.body as any;
+  const { email } = req.body as { email?: string };
   if (!email) return res.status(400).json({ message: 'Email is required' });
 
   const resetUrl = await AuthService.requestPasswordReset(email);
@@ -102,7 +102,7 @@ export const forgotPassword = catchAsync(async (req: Request, res: Response, nex
 });
 
 export const resetPassword = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const { token, email, password } = req.body as any;
+  const { token, email, password } = req.body as { token?: string; email?: string; password?: string };
   if (!token || !email || !password) return res.status(400).json({ message: 'Missing fields' });
 
   try {
@@ -118,7 +118,7 @@ export const resetPassword = catchAsync(async (req: Request, res: Response, next
 });
 
 export const validateReset = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const { token, email } = req.query as any;
+  const { token, email } = req.query as { token?: string; email?: string };
   if (!token || !email) return res.status(400).json({ message: 'Missing token or email' });
 
   const isValid = await AuthService.validateReset(String(token), String(email));

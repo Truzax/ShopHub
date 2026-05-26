@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User';
 import { Request, Response, NextFunction } from 'express';
 
-export default async function (req: Request & { user?: any }, res: Response, next: NextFunction) {
+export default async function (req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization as string | undefined;
   if (!authHeader || !authHeader.startsWith('Bearer ')) return res.status(401).json({ message: 'No token provided' });
   const token = authHeader.split(' ')[1];
