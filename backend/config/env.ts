@@ -10,7 +10,11 @@ const envSchema = z.object({
   MONGO_URI: z.string().url(),
   JWT_SECRET: z.string().min(10),
   REFRESH_TOKEN_EXPIRES_MS: z.string().default('604800000'), // 7 days
-  FRONTEND_ORIGIN: z.string().url().default('http://localhost:4200'),
+  FRONTEND_ORIGIN: z
+    .string()
+    .default('http://localhost:4200')
+    .transform((value) => value.split(',').map((origin) => origin.trim()).filter((o) => o.length > 0))
+    .pipe(z.array(z.string().url()).nonempty()),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
 });
 

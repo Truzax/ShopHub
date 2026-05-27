@@ -3,7 +3,7 @@ import jwt, { Secret } from 'jsonwebtoken';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import mongoose from 'mongoose';
-
+import { env } from '../config/env';
 const ACCESS_TOKEN_EXPIRES = process.env.JWT_EXPIRES_IN || '15m';
 
 const SMTP_PORT = parseInt(process.env.SMTP_PORT || '587', 10);
@@ -114,7 +114,7 @@ export class AuthService {
     (user as any).resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
 
-    const frontend = process.env.FRONTEND_ORIGIN || 'http://localhost:4200';
+    const frontend = env.FRONTEND_ORIGIN[0];
     const resetUrl = `${frontend}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
 
     if (hasSmtpConfig()) {

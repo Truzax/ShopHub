@@ -1,0 +1,63 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  backend-test:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+    - name: Install dependencies
+      run: npm ci
+    - name: Run Tests
+      run: npm test
+      env:
+        # Dummy credentials for startup validation (tests completely mock the DB)
+        MONGO_URI: mongodb://localhost:27017/shophub_test
+        JWT_SECRET: super_secret_test_jwt_key_that_is_long_enough
+
+  frontend-test:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+    - name: Install dependencies
+      run: npm ci
+    - name: Run Tests
+      run: npm run test -- --watch=false --browsers=ChromeHeadless
+
+  build-validation:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    needs: [backend-test, frontend-test]
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build Backend Image
+      run: docker build -t shophub-backend ./backend
+      
+    - name: Build Frontend Image
+      run: docker build -t shophub-frontend ./frontend
