@@ -9,33 +9,24 @@ export const authInterceptor: HttpInterceptorFn = (
   next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> => {
   const authService = inject(AuthService);
-  const token = authService.getAccessToken();
 
-  let authReq = req;
-  if (token) {
-    authReq = req.clone({
-      setHeaders: { Authorization: `Bearer ${token}` }
-    });
-  }
+  const authReq = req.clone({
+    withCredentials: true
+  });
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
       // Prevent recursive refresh loops if auth endpoint itself fails
       if (error.status === 401 && !req.url.includes('/api/auth/')) {
         return authService.refresh().pipe(
-          switchMap((res: any) => {
-            const newToken = res?.token;
-            if (newToken) {
-              const retryReq = req.clone({
-                setHeaders: { Authorization: `Bearer ${newToken}` }
-              });
-              return next(retryReq);
-            }
-            authService.logout();
-            return throwError(() => error);
+          switchMap(() => {
+            const retryReq = req.clone({
+              withCredentials: true
+            });
+            return next(retryReq);
           }),
           catchError((err) => {
-            authService.logout();
+            authService.logout().subscribe();
             return throwError(() => err);
           })
         );

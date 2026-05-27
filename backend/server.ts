@@ -1,13 +1,6 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
-const requiredEnv = ['JWT_SECRET', 'MONGO_URI'];
-for (const env of requiredEnv) {
-  if (!process.env[env]) {
-    console.error(`FATAL ERROR: ${env} is not defined in environment variables.`);
-    process.exit(1);
-  }
-}
+import { env } from './config/env';
+import { logger } from './utils/logger';
+import pinoHttp from 'pino-http';
 
 import express from 'express';
 import cors from 'cors';
@@ -30,13 +23,14 @@ app.set('trust proxy', 1);
 app.use(helmet());
 app.use(compression());
 app.use(express.json({ limit: '10kb' }));
-app.use(cors({ origin: process.env.FRONTEND_ORIGIN || 'http://localhost:4200', credentials: true }));
+app.use(cors({ origin: env.FRONTEND_ORIGIN || 'http://localhost:4200', credentials: true }));
 app.use(cookieParser());
+app.use(pinoHttp({ logger }));
 
-const PORT = process.env.PORT || 3000;
+const PORT = env.PORT || 3000;
 
 // Connect to MongoDB
-connectDB().catch((err) => console.error('DB connection error:', err));
+connectDB().catch((err) => logger.error({ err }, 'DB connection error'));
 
 // Base route
 app.get('/', (req, res) => res.send('Server is running'));
@@ -56,5 +50,5 @@ app.use(errorHandler);
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server is running on port: ${PORT}`);
+  logger.info(`Server is running on port: ${PORT}`);
 });

@@ -2,15 +2,18 @@ import { Request, Response, NextFunction } from 'express';
 import type { CookieOptions } from 'express';
 import { AuthService } from '../services/authService';
 import { catchAsync } from '../middleware/catchAsync';
+import { env } from '../config/env';
+import { logger } from '../utils/logger';
 
-const REFRESH_TOKEN_EXPIRES_MS = parseInt(process.env.REFRESH_TOKEN_EXPIRES_MS || String(7 * 24 * 60 * 60 * 1000), 10);
+const REFRESH_TOKEN_EXPIRES_MS = parseInt(env.REFRESH_TOKEN_EXPIRES_MS, 10);
+const ACCESS_TOKEN_EXPIRES_MS = 15 * 60 * 1000; // 15 minutes
 
-function cookieOptions(): CookieOptions {
+function cookieOptions(maxAge: number): CookieOptions {
   return {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: REFRESH_TOKEN_EXPIRES_MS,
+    maxAge,
   } as CookieOptions;
 }
 
@@ -20,10 +23,10 @@ export const signup = catchAsync(async (req: Request, res: Response, next: NextF
 
   try {
     const { user, accessToken, refreshToken } = await AuthService.signup({ name, email, password, role });
-    res.cookie('refreshToken', refreshToken, cookieOptions());
+    res.cookie('refreshToken', refreshToken, cookieOptions(REFRESH_TOKEN_EXPIRES_MS));
+    res.cookie('accessToken', accessToken, cookieOptions(ACCESS_TOKEN_EXPIRES_MS));
     res.status(201).json({
-      user: { id: user._id, name: user.name, email: user.email, role: user.role },
-      token: accessToken,
+      user: { id: user._id, name: user.name, email: user.email, role: user.role }
     });
   } catch (error: any) {
     if (error.status) {
@@ -39,8 +42,9 @@ export const login = catchAsync(async (req: Request, res: Response, next: NextFu
 
   try {
     const { user, accessToken, refreshToken } = await AuthService.login({ email, password });
-    res.cookie('refreshToken', refreshToken, cookieOptions());
-    res.json({ user: { id: user._id, name: user.name, email: user.email, role: user.role }, token: accessToken });
+    res.cookie('refreshToken', refreshToken, cookieOptions(REFRESH_TOKEN_EXPIRES_MS));
+    res.cookie('accessToken', accessToken, cookieOptions(ACCESS_TOKEN_EXPIRES_MS));
+    res.json({ user: { id: user._id, name: user.name, email: user.email, role: user.role } });
   } catch (error: any) {
     if (error.status) {
       return res.status(error.status).json({ message: error.message });
@@ -55,8 +59,9 @@ export const refresh = catchAsync(async (req: Request, res: Response, next: Next
 
   try {
     const { user, accessToken, newRefresh } = await AuthService.refresh(token);
-    res.cookie('refreshToken', newRefresh, cookieOptions());
-    res.json({ token: accessToken, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+    res.cookie('refreshToken', newRefresh, cookieOptions(REFRESH_TOKEN_EXPIRES_MS));
+    res.cookie('accessToken', accessToken, cookieOptions(ACCESS_TOKEN_EXPIRES_MS));
+    res.json({ user: { id: user._id, name: user.name, email: user.email, role: user.role } });
   } catch (error: any) {
     if (error.status) {
       return res.status(error.status).json({ message: error.message });
@@ -70,7 +75,8 @@ export const logout = catchAsync(async (req: Request, res: Response, next: NextF
   if (token) {
     await AuthService.logout(token);
   }
-  res.clearCookie('refreshToken', cookieOptions());
+  res.clearCookie('refreshToken', cookieOptions(0));
+  res.clearCookie('accessToken', cookieOptions(0));
   res.status(204).end();
 });
 
@@ -83,19 +89,19 @@ export const forgotPassword = catchAsync(async (req: Request, res: Response, nex
     return res.json({ message: 'If an account exists, a reset link has been sent' });
   }
 
-  const isDev = process.env.NODE_ENV === 'development';
+  const isDev = env.NODE_ENV === 'development';
   const hasSmtp = !!(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
 
   if (!hasSmtp) {
     if (isDev) {
-      console.log('Password reset link:', resetUrl);
+      logger.info(`Password reset link: ${resetUrl}`);
       return res.json({ message: 'Reset link generated' });
     }
     return res.json({ message: 'Reset link generated' });
   }
 
   if (isDev) {
-    console.log('Password reset link:', resetUrl);
+    logger.info(`Password reset link: ${resetUrl}`);
     return res.json({ message: 'Reset link sent' });
   }
   return res.json({ message: 'Reset link sent' });
@@ -107,8 +113,9 @@ export const resetPassword = catchAsync(async (req: Request, res: Response, next
 
   try {
     const { user, accessToken, refreshToken } = await AuthService.resetPassword({ token, email, password });
-    res.cookie('refreshToken', refreshToken, cookieOptions());
-    res.json({ message: 'Password reset successful', token: accessToken, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+    res.cookie('refreshToken', refreshToken, cookieOptions(REFRESH_TOKEN_EXPIRES_MS));
+    res.cookie('accessToken', accessToken, cookieOptions(ACCESS_TOKEN_EXPIRES_MS));
+    res.json({ message: 'Password reset successful', user: { id: user._id, name: user.name, email: user.email, role: user.role } });
   } catch (error: any) {
     if (error.status) {
       return res.status(error.status).json({ message: error.message });
