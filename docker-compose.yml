@@ -15,8 +15,7 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - path: ./backend/.env
-        required: false
+      - ./backend/.env
     environment:
       - FRONTEND_ORIGIN=http://localhost,http://localhost:4200
       - MONGO_URI=mongodb://mongodb:27017/shophub
@@ -29,8 +28,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
-    depends_on:
-      - backend
 
 volumes:
   mongodb_data:

@@ -114,7 +114,7 @@ export class AuthService {
     (user as any).resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
 
-    const frontend = Array.isArray(env.FRONTEND_ORIGIN) ? env.FRONTEND_ORIGIN[0] : (env.FRONTEND_ORIGIN || 'http://localhost:4200');
+    const frontend = env.FRONTEND_ORIGIN[0];
     const resetUrl = `${frontend}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
 
     if (hasSmtpConfig()) {

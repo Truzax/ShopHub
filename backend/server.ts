@@ -23,7 +23,7 @@ app.set('trust proxy', 1);
 app.use(helmet());
 app.use(compression());
 app.use(express.json({ limit: '10kb' }));
-const allowedOrigins = Array.isArray(env.FRONTEND_ORIGIN) ? env.FRONTEND_ORIGIN : ['http://localhost:4200'];
+const allowedOrigins = env.FRONTEND_ORIGIN;
 app.use(cors({ 
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {

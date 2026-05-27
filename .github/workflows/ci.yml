@@ -26,6 +26,7 @@ jobs:
     - name: Run Tests
       run: npm test
       env:
+        # Dummy credentials for startup validation (tests completely mock the DB)
         MONGO_URI: mongodb://localhost:27017/shophub_test
         JWT_SECRET: super_secret_test_jwt_key_that_is_long_enough
 
