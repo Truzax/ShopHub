@@ -13,9 +13,8 @@ const envSchema = z.object({
   FRONTEND_ORIGIN: z
     .string()
     .default('http://localhost:4200')
-    .transform((value) => value.split(',').map((origin) => origin.trim()))
-    .pipe(z.array(z.string().url()).nonempty())
-    .transform((origins) => origins.join(',')),
+    .transform((value) => value.split(',').map((origin) => origin.trim()).filter((o) => o.length > 0))
+    .pipe(z.array(z.string().url()).nonempty()),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
 });
 
