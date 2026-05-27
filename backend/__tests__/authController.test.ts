@@ -73,9 +73,9 @@ describe('Auth Controller', () => {
       
       expect(mockSave).toHaveBeenCalled();
       expect(mockRes.cookie).toHaveBeenCalledWith('refreshToken', 'mockRefreshToken', expect.any(Object));
+      expect(mockRes.cookie).toHaveBeenCalledWith('accessToken', 'mockAccessToken', expect.any(Object));
       expect(mockRes.status).toHaveBeenCalledWith(201);
       expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({
-        token: 'mockAccessToken',
         user: expect.objectContaining({ name: 'Test' })
       }));
     });
@@ -155,7 +155,8 @@ describe('Auth Controller', () => {
       await login(mockReq as Request, mockRes as Response, mockNext);
 
       expect(mockUser.comparePassword).toHaveBeenCalledWith('pass');
-      expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({ token: 'mockAccessToken' }));
+      expect(mockRes.cookie).toHaveBeenCalledWith('accessToken', 'mockAccessToken', expect.any(Object));
+      expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({ user: expect.objectContaining({ name: 'Test' }) }));
     });
     
     it('should call next on error', async () => {
@@ -202,7 +203,8 @@ describe('Auth Controller', () => {
       expect(mockUser.removeRefreshToken).toHaveBeenCalledWith('valid');
       expect(mockUser.addRefreshToken).toHaveBeenCalledWith('newRefresh');
       expect(mockRes.cookie).toHaveBeenCalledWith('refreshToken', 'newRefresh', expect.any(Object));
-      expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({ token: 'newAccessToken' }));
+      expect(mockRes.cookie).toHaveBeenCalledWith('accessToken', 'newAccessToken', expect.any(Object));
+      expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({ user: expect.any(Object) }));
     });
     
     it('should call next on error', async () => {
@@ -376,8 +378,8 @@ describe('Auth Controller', () => {
 
       await resetPassword(mockReq as Request, mockRes as Response, mockNext);
       expect(mockUser.save).toHaveBeenCalled();
-      expect(mockRes.cookie).toHaveBeenCalled();
-      expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Password reset successful', token: 'mockAccessToken' }));
+      expect(mockRes.cookie).toHaveBeenCalledWith('accessToken', 'mockAccessToken', expect.any(Object));
+      expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Password reset successful' }));
     });
     
     it('should call next on error', async () => {

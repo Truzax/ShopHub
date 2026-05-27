@@ -31,12 +31,8 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  // Initialize the user state from the server if a token exists
+  // Initialize the user state from the server by verifying the HttpOnly cookie
   initializeAuth(): Observable<any> {
-      if (!this.getAccessToken()) {
-          this.initialized = true;
-          return of(null);
-      }
       return this.getProfile().pipe(
           tap(user => {
               this.currentUserSubject.next(user);
@@ -53,9 +49,8 @@ export class AuthService {
   login(email: string, password: string): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.baseAuth}/login`, { email, password }, { withCredentials: true }).pipe(
       tap((res) => {
-        if (res && res.token) {
+        if (res && res.user) {
             localStorage.removeItem('cart'); // Clear any previous user's cart
-            localStorage.setItem('access_token', res.token);
             this.currentUserSubject.next(res.user);
         }
       })
@@ -65,9 +60,8 @@ export class AuthService {
   signup(payload: { name: string; email: string; password: string }): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.baseAuth}/signup`, payload, { withCredentials: true }).pipe(
       tap((res) => {
-        if (res && res.token) {
+        if (res && res.user) {
             localStorage.removeItem('cart'); // Clear any previous user's cart
-            localStorage.setItem('access_token', res.token);
             this.currentUserSubject.next(res.user);
         }
       })
@@ -81,8 +75,7 @@ export class AuthService {
   resetPassword(payload: { email: string; token: string; password: string }): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.baseAuth}/reset-password`, payload, { withCredentials: true }).pipe(
       tap((res) => {
-        if (res && res.token) {
-            localStorage.setItem('access_token', res.token);
+        if (res && res.user) {
             this.currentUserSubject.next(res.user);
         }
       })
@@ -107,7 +100,6 @@ export class AuthService {
   }
 
   private logoutLocally() {
-      localStorage.removeItem('access_token');
       localStorage.removeItem('cart'); // Ensure cart doesn't leak to a new user
       this.currentUserSubject.next(null);
       this.router.navigate(['/login']);
@@ -116,8 +108,7 @@ export class AuthService {
   refresh(): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.baseAuth}/refresh`, {}, { withCredentials: true }).pipe(
       tap((res) => {
-        if (res && res.token) {
-            localStorage.setItem('access_token', res.token);
+        if (res && res.user) {
             this.currentUserSubject.next(res.user);
         }
       }),
@@ -128,16 +119,8 @@ export class AuthService {
     );
   }
 
-  getAccessToken(): string | null {
-    return localStorage.getItem('access_token');
-  }
-
-  setAccessToken(token: string) {
-    localStorage.setItem('access_token', token);
-  }
-
   isAuthenticated(): boolean {
-    return !!this.getAccessToken();
+    return this.currentUserSubject.value !== null;
   }
 
   getUserValue(): User | null {
@@ -145,8 +128,6 @@ export class AuthService {
   }
 
   getProfile(): Observable<User> {
-    const token = this.getAccessToken();
-    const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;
-    return this.http.get<User>(`${this.baseUsers}/me`, { headers });
+    return this.http.get<User>(`${this.baseUsers}/me`, { withCredentials: true });
   }
 }
