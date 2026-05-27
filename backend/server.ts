@@ -23,7 +23,17 @@ app.set('trust proxy', 1);
 app.use(helmet());
 app.use(compression());
 app.use(express.json({ limit: '10kb' }));
-app.use(cors({ origin: env.FRONTEND_ORIGIN || 'http://localhost:4200', credentials: true }));
+const allowedOrigins = (env.FRONTEND_ORIGIN || 'http://localhost:4200').split(',');
+app.use(cors({ 
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }, 
+  credentials: true 
+}));
 app.use(cookieParser());
 app.use(pinoHttp({ logger }));
 
