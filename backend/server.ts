@@ -24,7 +24,9 @@ app.set('trust proxy', 1);
 app.use(helmet());
 app.use(compression());
 app.use(express.json({ limit: '10kb' }));
-// Express 5 req.query is read-only, so we use sanitize manually to mutate without reassignment
+// Express 5 req.query is read-only, so we use sanitize manually to mutate without reassignment.
+// Note: While (mongoSanitize as any).sanitize is an undocumented internal method,
+// using the standard app.use(mongoSanitize()) middleware crashes Express 5 on req.query.
 app.use((req, res, next) => {
   ['body', 'params', 'headers', 'query'].forEach((key) => {
     if ((req as any)[key]) {

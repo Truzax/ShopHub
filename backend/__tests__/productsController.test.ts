@@ -8,7 +8,9 @@ jest.mock('../config/redis', () => ({
   __esModule: true,
   default: {
     get: jest.fn().mockResolvedValue(null),
-    setex: jest.fn().mockResolvedValue('OK')
+    setex: jest.fn().mockResolvedValue('OK'),
+    del: jest.fn().mockResolvedValue(1),
+    keys: jest.fn().mockResolvedValue([])
   }
 }));
 
@@ -48,12 +50,11 @@ describe('ProductsController', () => {
         });
 
         it('should return paginated products', async () => {
-             const skipMock = jest.fn().mockReturnThis();
              const limitMock = jest.fn().mockResolvedValue([{ name: 'Product A' }]);
+             const sortMock = jest.fn().mockReturnValue({ limit: limitMock });
 
              (Product.find as jest.Mock).mockReturnValue({
-                 skip: skipMock,
-                 limit: limitMock
+                 sort: sortMock
              });
              (Product.countDocuments as jest.Mock).mockResolvedValue(1);
 
@@ -65,6 +66,9 @@ describe('ProductsController', () => {
                  success: true,
                  count: 1,
                  nextCursor: null,
+                 page: 1,
+                 pages: 1,
+                 total: 1,
                  data: [{ name: 'Product A' }]
              });
         });
