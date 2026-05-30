@@ -1,20 +1,23 @@
-import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { Injectable, OnDestroy, signal, computed } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { Subject } from 'rxjs';
 import { CartItem, Cart } from '../models/cart.model';
 import { Product } from '../models/product.model';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth';
 import { environment } from '../../environments/environment';
-import { tap, filter, take, switchMap, map, takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CartService implements OnDestroy {
-  private cartSubject = new BehaviorSubject<Cart>({ items: [], total: 0 });
-  public cart$ = this.cartSubject.asObservable();
+  private cartSignal = signal<Cart>({ items: [], total: 0 });
+  public readonly cart = this.cartSignal.asReadonly();
+  public readonly totalItems = computed(() => this.cartSignal().items.reduce((sum, item) => sum + item.quantity, 0));
+  public cart$ = toObservable(this.cartSignal);
+
   private apiUrl = `${environment.apiUrl}/cart`;
-  private isSyncing = false;
   private destroy$ = new Subject<void>();
 
   constructor(private http: HttpClient, private authService: AuthService) {
@@ -25,19 +28,15 @@ export class CartService implements OnDestroy {
   private initCartSync(): void {
     let previousUser: any = null;
     
-    // When user changes (login/logout)
     this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
       if (user) {
         if (previousUser && previousUser.id !== user.id) {
-          // Changed from one authenticated user to another without explicit logout
-          this.cartSubject.next({ items: [], total: 0 });
+          this.cartSignal.set({ items: [], total: 0 });
           localStorage.removeItem('cart');
         }
-        // User just logged in, sync guest cart to server
         this.mergeAndSyncWithServer();
       } else {
-        // User logged out, clear the local cart
-        this.cartSubject.next({ items: [], total: 0 });
+        this.cartSignal.set({ items: [], total: 0 });
         localStorage.removeItem('cart');
       }
       previousUser = user;
@@ -57,14 +56,13 @@ export class CartService implements OnDestroy {
   }
 
   private mergeAndSyncWithServer(): void {
-    const localCart = this.cartSubject.value;
+    const localCart = this.cartSignal();
     
     this.http.get<any>(this.apiUrl, { headers: this.getHeaders() }).subscribe(
       (response) => {
         const serverCartItems = response.data?.items || [];
         
         if (localCart.items.length > 0) {
-          // Merge local into server
           const mergedItems = [...serverCartItems];
           
           localCart.items.forEach(localItem => {
@@ -79,11 +77,9 @@ export class CartService implements OnDestroy {
             }
           });
           
-          // Save merged to server
           this.saveCartToServer(mergedItems);
         } else if (serverCartItems.length > 0) {
-          // Just load server cart
-          this.cartSubject.next({
+          this.cartSignal.set({
             items: serverCartItems,
             total: this.calculateTotal(serverCartItems)
           });
@@ -105,7 +101,7 @@ export class CartService implements OnDestroy {
     this.http.post<any>(this.apiUrl, payload, { headers: this.getHeaders() }).subscribe(
       (response) => {
         const updatedItems = response.data?.items || [];
-        this.cartSubject.next({
+        this.cartSignal.set({
           items: updatedItems,
           total: this.calculateTotal(updatedItems)
         });
@@ -123,8 +119,8 @@ export class CartService implements OnDestroy {
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
       try {
-        const cart = JSON.parse(savedCart);
-        this.cartSubject.next(cart);
+        const cartData = JSON.parse(savedCart);
+        this.cartSignal.set(cartData);
       } catch (e) {
         console.error('Error loading cart from storage:', e);
       }
@@ -132,15 +128,14 @@ export class CartService implements OnDestroy {
   }
 
   private saveCartToLocalStorage(): void {
-    localStorage.setItem('cart', JSON.stringify(this.cartSubject.value));
+    localStorage.setItem('cart', JSON.stringify(this.cartSignal()));
   }
 
   private saveAndSync(): void {
     this.saveCartToLocalStorage();
     
-    // Also sync to server if logged in
     if (this.authService.isAuthenticated()) {
-      const items = this.cartSubject.value.items;
+      const items = this.cartSignal().items;
       this.saveCartToServer(items);
     }
   }
@@ -150,7 +145,7 @@ export class CartService implements OnDestroy {
   }
 
   addToCart(product: Product, quantity: number = 1): { success: boolean; addedQuantity: number; message?: string } {
-    const currentCart = this.cartSubject.value;
+    const currentCart = this.cartSignal();
     const productId = this.getProductId(product);
     const existingItem = currentCart.items.find(
       (item) => this.getProductId(item.product) === productId
@@ -167,17 +162,19 @@ export class CartService implements OnDestroy {
     }
 
     const quantityToAdd = Math.min(quantity, availableQuantity);
+    let newItems = [...currentCart.items];
 
     if (existingItem) {
-      currentCart.items = currentCart.items.map(item => 
+      newItems = newItems.map(item => 
         this.getProductId(item.product) === productId
           ? { ...item, quantity: item.quantity + quantityToAdd }
           : item
       );
     } else {
-      currentCart.items = [...currentCart.items, { product, quantity: quantityToAdd }];
+      newItems = [...newItems, { product, quantity: quantityToAdd }];
     }
 
+    this.cartSignal.set({ ...currentCart, items: newItems });
     this.updateCartTotal();
     this.saveAndSync();
 
@@ -191,19 +188,21 @@ export class CartService implements OnDestroy {
   }
 
   removeFromCart(productId: string): void {
-    const currentCart = this.cartSubject.value;
-    currentCart.items = currentCart.items.filter(
+    const currentCart = this.cartSignal();
+    const newItems = currentCart.items.filter(
       (item) => this.getProductId(item.product) !== productId
     );
+    this.cartSignal.set({ ...currentCart, items: newItems });
     this.updateCartTotal();
     this.saveAndSync();
   }
 
   updateQuantity(productId: string, quantity: number): { success: boolean; addedQuantity: number; message?: string } {
-    const currentCart = this.cartSubject.value;
+    const currentCart = this.cartSignal();
     const item = currentCart.items.find(
       (i) => this.getProductId(i.product) === productId
     );
+    
     if (item) {
       const maxQuantity = Math.max(item.product.stock, 0);
 
@@ -213,11 +212,13 @@ export class CartService implements OnDestroy {
       }
 
       const nextQuantity = Math.min(quantity, maxQuantity);
-      currentCart.items = currentCart.items.map(i =>
+      const newItems = currentCart.items.map(i =>
         this.getProductId(i.product) === productId
           ? { ...i, quantity: nextQuantity }
           : i
       );
+      
+      this.cartSignal.set({ ...currentCart, items: newItems });
       this.updateCartTotal();
       this.saveAndSync();
 
@@ -238,11 +239,11 @@ export class CartService implements OnDestroy {
   }
 
   getCart(): Cart {
-    return this.cartSubject.value;
+    return this.cartSignal();
   }
 
   clearCart(): void {
-    this.cartSubject.next({ items: [], total: 0 });
+    this.cartSignal.set({ items: [], total: 0 });
     localStorage.removeItem('cart');
     
     if (this.authService.isAuthenticated()) {
@@ -254,11 +255,11 @@ export class CartService implements OnDestroy {
   }
 
   private updateCartTotal(): void {
-    const currentCart = this.cartSubject.value;
-    currentCart.total = currentCart.items.reduce(
+    const currentCart = this.cartSignal();
+    const total = currentCart.items.reduce(
       (sum, item) => sum + (item.product.price || 0) * item.quantity,
       0
     );
-    this.cartSubject.next({ ...currentCart });
+    this.cartSignal.set({ ...currentCart, total });
   }
 }

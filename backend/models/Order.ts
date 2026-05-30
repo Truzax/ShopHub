@@ -60,6 +60,7 @@ OrderSchema.pre('save', function() {
 });
 
     // Add indexes for analytics aggregation performance
+    OrderSchema.index({ user: 1, date: -1 });
     OrderSchema.index({ date: 1, status: 1 });
     OrderSchema.index({ 'products.product': 1 });
     OrderSchema.index({ status: 1 });

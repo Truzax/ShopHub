@@ -1,6 +1,6 @@
 <div class="p-6 md:p-8 animate-fade-in">
   <!-- Empty Cart -->
-  <div *ngIf="cart.items.length === 0" class="text-center py-16">
+  <div *ngIf="cart().items.length === 0" class="text-center py-16">
     <div class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 bg-[var(--muted)]">
       <mat-icon class="text-[3rem] w-[3rem] h-[3rem] text-[var(--muted-foreground)]">shopping_cart</mat-icon>
     </div>
@@ -12,7 +12,7 @@
   </div>
 
   <!-- Cart with Items -->
-  <div *ngIf="cart.items.length > 0">
+  <div *ngIf="cart().items.length > 0">
     <a (click)="continueShopping()" class="inline-flex items-center gap-2 mb-6 text-sm cursor-pointer hover:underline text-[var(--muted-foreground)]">
       <mat-icon class="text-[1rem] w-[1rem] h-[1rem]">chevron_left</mat-icon>
       Continue Shopping
@@ -23,7 +23,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <!-- Cart Items -->
       <div class="lg:col-span-2 space-y-4">
-        <div *ngFor="let item of cart.items" class="ref-card">
+        <div *ngFor="let item of cart().items" class="ref-card">
           <div class="ref-card-content">
             <div class="flex gap-6">
               <!-- Product thumbnail -->
@@ -70,7 +70,7 @@
             <div class="space-y-2">
               <div class="flex justify-between">
                 <span class="text-[var(--muted-foreground)]">Subtotal</span>
-                <span>{{ cart.total | currency:'INR':'symbol':'1.0-2' }}</span>
+                <span>{{ cart().total | currency:'INR':'symbol':'1.0-2' }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-[var(--muted-foreground)]">Shipping</span>
@@ -80,7 +80,7 @@
             <hr class="ref-separator">
             <div class="flex justify-between font-semibold">
               <span>Total</span>
-              <span>{{ cart.total | currency:'INR':'symbol':'1.0-2' }}</span>
+              <span>{{ cart().total | currency:'INR':'symbol':'1.0-2' }}</span>
             </div>
             <button class="ref-btn ref-btn-primary ref-btn-lg w-full" (click)="checkout()">
               Proceed to Checkout

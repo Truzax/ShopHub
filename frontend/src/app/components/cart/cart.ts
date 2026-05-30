@@ -1,5 +1,4 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, inject, OnInit, ChangeDetectionStrategy, Signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
@@ -14,6 +13,7 @@ import { Cart } from '../../models/cart.model';
 @Component({
   selector: 'app-cart',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     FormsModule,
@@ -28,19 +28,14 @@ import { Cart } from '../../models/cart.model';
   styleUrls: ['./cart.css'],
 })
 export class CartComponent implements OnInit {
-  cart: Cart = { items: [], total: 0 };
+  cart: Signal<Cart>;
   displayedColumns: string[] = ['product', 'price', 'quantity', 'subtotal', 'actions'];
-  private destroyRef = inject(DestroyRef);
 
-  constructor(private cartService: CartService, private router: Router) {}
-
-  ngOnInit(): void {
-    this.cartService.cart$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((cart) => {
-        this.cart = cart;
-      });
+  constructor(public cartService: CartService, private router: Router) {
+    this.cart = this.cartService.cart;
   }
+
+  ngOnInit(): void {}
 
   updateQuantity(productId: string, quantity: number): void {
     this.cartService.updateQuantity(productId, quantity);
@@ -51,7 +46,7 @@ export class CartComponent implements OnInit {
   }
 
   checkout(): void {
-    if (this.cart.items.length === 0) {
+    if (this.cart().items.length === 0) {
       alert('Cart is empty');
       return;
     }
