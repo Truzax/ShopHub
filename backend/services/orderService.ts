@@ -61,12 +61,14 @@ export class OrderService {
 
     const hasNext = orders.length === limit;
 
-    return {
+    const response = {
       success: true,
       count: orders.length,
-      nextCursor: hasNext ? orders[orders.length - 1]._id : null,
+      nextCursor: hasNext ? orders[orders.length - 1]?._id : null,
       data: orders
     };
+
+    return response;
   }
 
   static async getOrderById(user: any, orderId: string) {

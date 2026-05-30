@@ -4,6 +4,13 @@ import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 
 jest.mock('../models/Product');
+jest.mock('../config/redis', () => ({
+  __esModule: true,
+  default: {
+    get: jest.fn().mockResolvedValue(null),
+    setex: jest.fn().mockResolvedValue('OK')
+  }
+}));
 
 describe('ProductsController', () => {
     let mockRequest: Partial<Request>;
@@ -57,9 +64,7 @@ describe('ProductsController', () => {
              expect(mockResponse.json).toHaveBeenCalledWith({
                  success: true,
                  count: 1,
-                 total: 1,
-                 page: 1,
-                 pages: 1,
+                 nextCursor: null,
                  data: [{ name: 'Product A' }]
              });
         });

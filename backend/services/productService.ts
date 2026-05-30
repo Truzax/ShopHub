@@ -32,7 +32,7 @@ export class ProductService {
     const response = {
       success: true,
       count: products.length,
-      nextCursor: hasNext ? products[products.length - 1]._id : null,
+      nextCursor: hasNext ? products[products.length - 1]?._id : null,
       data: products
     };
 
