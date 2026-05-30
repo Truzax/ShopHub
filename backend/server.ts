@@ -7,6 +7,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import compression from 'compression';
+import mongoSanitize from 'express-mongo-sanitize';
 import connectDB from './config/db';
 import usersRoute from './routes/users';
 import authRoute from './routes/auth';
@@ -23,6 +24,15 @@ app.set('trust proxy', 1);
 app.use(helmet());
 app.use(compression());
 app.use(express.json({ limit: '10kb' }));
+// Express 5 req.query is read-only, so we use sanitize manually to mutate without reassignment
+app.use((req, res, next) => {
+  ['body', 'params', 'headers', 'query'].forEach((key) => {
+    if ((req as any)[key]) {
+      mongoSanitize.sanitize((req as any)[key]);
+    }
+  });
+  next();
+});
 const allowedOrigins = env.FRONTEND_ORIGIN;
 app.use(cors({ 
   origin: function (origin, callback) {

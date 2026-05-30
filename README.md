@@ -5,7 +5,7 @@
   <img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" />
   <br/>
   
-  <h1>🛍️ E-Commerce Analytics Dashboard</h1>
+  <h1>ShopHub</h1>
   <p><strong>A full-stack MEAN application for advanced e-commerce insights and management.</strong></p>
 
   <p>

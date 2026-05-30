@@ -44,27 +44,27 @@ export class OrderService {
   static async getOrders(user: any, queryParams: any) {
     if (!user) throw { status: 401, message: 'User not authenticated' };
 
-    const page = parseInt(queryParams.page as string, 10) || 1;
     const limit = parseInt(queryParams.limit as string, 10) || 10;
-    const skip = (page - 1) * limit;
+    const lastId = queryParams.lastId as string;
 
-    const query = user.role === 'admin' ? {} : { user: user._id };
+    const query: any = user.role === 'admin' ? {} : { user: user._id };
+    if (lastId) {
+      // For orders we are sorting by date -1, which means _id would be $lt for descending.
+      query._id = { $lt: lastId };
+    }
 
     const orders = await Order.find(query)
-      .sort({ date: -1 })
+      .sort({ date: -1, _id: -1 })
       .populate('user', 'name email')
       .populate('products.product', 'name price category')
-      .skip(skip)
       .limit(limit);
 
-    const total = await Order.countDocuments(query);
+    const hasNext = orders.length === limit;
 
     return {
       success: true,
       count: orders.length,
-      total,
-      page,
-      pages: Math.ceil(total / limit),
+      nextCursor: hasNext ? orders[orders.length - 1]._id : null,
       data: orders
     };
   }

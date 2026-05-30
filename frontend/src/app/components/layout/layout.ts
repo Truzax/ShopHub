@@ -13,7 +13,7 @@ import { map } from 'rxjs/operators';
 @Component({
   standalone: true,
   selector: 'app-layout',
-  imports: [RouterOutlet, RouterModule, MatToolbarModule, MatMenuModule, MatIconModule, MatDividerModule, MatBadgeModule, AsyncPipe, NgIf],
+  imports: [RouterOutlet, RouterModule, MatToolbarModule, MatMenuModule, MatIconModule, MatDividerModule, MatBadgeModule, NgIf],
   template: `
     <!-- Admin Sidebar -->
     <aside *ngIf="isAdmin" class="admin-sidebar" [class.open]="sidebarOpen()">
@@ -85,7 +85,7 @@ import { map } from 'rxjs/operators';
 
             <!-- Cart (customer only) -->
             <button *ngIf="!isAdmin" class="theme-toggle" routerLink="/cart">
-              <mat-icon [matBadge]="(cartItemCount$ | async)" matBadgeColor="warn" matBadgeSize="small"
+              <mat-icon [matBadge]="cartItemCount()" matBadgeColor="warn" matBadgeSize="small"
                 class="text-xl w-5 h-5">
                 shopping_cart
               </mat-icon>
@@ -143,9 +143,7 @@ export class LayoutComponent {
   sidebarOpen = signal(false);
   darkMode = signal(false);
 
-  cartItemCount$ = this.cartService.cart$.pipe(
-    map(cart => cart.items.length)
-  );
+  cartItemCount = this.cartService.totalItems;
 
   constructor() {
     this.auth.initializeAuth().subscribe();
